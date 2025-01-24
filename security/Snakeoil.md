@@ -62,3 +62,5 @@ Newest ones at the bottom.
 https://www.heise.de/news/Zero-Day-Sicherheitsluecke-in-Sonicwall-SSL-VPN-wird-angegriffen-10229915.html
 https://www.heise.de/news/Ivanti-Connect-Secure-Angreifer-attackieren-kritische-Sicherheitsluecke-10233099.html
 
+- SonicWall SMA 1000 - Zero-Day  
+https://psirt.global.sonicwall.com/vuln-detail/SNWLID-2025-0002
