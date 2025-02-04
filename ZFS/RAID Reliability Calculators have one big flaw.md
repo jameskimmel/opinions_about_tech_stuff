@@ -35,7 +35,7 @@ The Seagate batch we bought has a horrible firmware error. All four of them die 
 For RAIDZ2 the pool is lost since we lost four drives. 
 For the mirror everything is fine.  
 
-In another scenario, the Seagate drives are fine, but the WDs have some issues. 8 years from now, they are extremely old. Maybe the helium in the HDD goes bad or the read heads, or the motor. Since you don't have a hot-swap, you need to shut down the system and put an additional spin-up on them. The resilver also puts an additional load on them.
+In another scenario, the Seagate drives are fine, but the WDs have some issues. 8 years from now, they are extremely old. Maybe the helium in the HDD goes bad or the read heads, or the motor. In a homelab scenario you probably don't have hot swap and you need to shut down the system and put an additional spin-up on them. The resilver also puts an additional load on them.
 For whatever reason, three of the WDs fail. 
 For RAIDZ2 the pool is lost since we lost three drives. 
 For the mirror everything is fine.  
