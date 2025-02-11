@@ -64,3 +64,6 @@ https://www.heise.de/news/Ivanti-Connect-Secure-Angreifer-attackieren-kritische-
 
 - SonicWall SMA 1000 - Zero-Day  
 https://psirt.global.sonicwall.com/vuln-detail/SNWLID-2025-0002
+
+- Solarwinds using an outdated and vulnerable version of OpenSSL
+https://www.heise.de/news/Solarwinds-Update-schliesst-teils-kritische-Luecken-in-Platform-10278244.html
