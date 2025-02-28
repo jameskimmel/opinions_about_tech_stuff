@@ -34,4 +34,4 @@ That is why for SLOG enterprise PLP drives are recommended. Not because of secur
 
 
 A word of caution: 
-In the past, there were none PLP SSDs that lied about sync. A twitter user found out by running some test. Unfortunately the twitter user deleted his account, so I can't share it with out. Some Phison E18 controllers in combination with bad firmware from ADATA and Patriot lied about sync. That is why I don't blindly trust cheap consumer drives.
+In the past, there were none PLP SSDs that lied about sync. A twitter user found out by running some test. Unfortunately the twitter user deleted his account, so I can't share it with you. Some Phison E18 controllers in combination with bad firmware from ADATA and Patriot lied about sync. That is why I don't blindly trust cheap consumer drives.
