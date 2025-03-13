@@ -5,7 +5,7 @@ In reality it is pretty easy to understand why BTC is stupid:
 ### BTC is not only zero sum game, but a negative sum game!
 
 That is all there is to it. BTC does not magically create wealth for all of us.  
-According to Bitcoiners, everybody could just buy BTC and become a rich and never needs so work again.  
+According to Bitcoiners, everybody could just buy BTC and become a rich and never needs to work again.  
 In reality every single $ that you get out of BTC, has to come from a bigger fool that put even more into BTC.
 
 Let us use an analogy that makes it easy to understand. For simplicity, we start with a zero sum game.  
