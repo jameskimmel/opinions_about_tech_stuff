@@ -1,0 +1,9 @@
+Beginners guide to ZFS:
+
+- Don’t use blockstorage for files, but datasets
+- Separate files from VM data
+- Don’t use RAIDZ for blockstorage
+- Use RAIDZ2 for big files that are sequentially read and written
+- Max out RAM. RAM will be used for ARC. 
+- If you need special vdev, you have to add it before you move data to your pool
+- Don’t use L2ARC or SLOG from the start. There is a high chance that your workload won’t need it. If needed you can still add it later on.
