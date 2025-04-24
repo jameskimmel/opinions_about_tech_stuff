@@ -1,12 +1,12 @@
 # The problem with RAIDZ or why you probably won't get the storage efficiency you think you will get.
-As a ZFS rookie, I struggled a fair bit to find out what settings I should use for my Proxmox hypervisor. Hopefully, this could help other ZFS rookies. 
+As a ZFS rookie, I struggled quiet a bit to figure out what settings I should use for my Proxmox hypervisor. Hopefully, this will help other ZFS rookies. 
 This text focuses on Proxmox, but it generally applies to all ZFS systems.
 
-**The whole document assumes ashift to be the default 12 or 4k, because that is the default for modern drives.**
+This entire document assumes an ashift of 12 (4K), which is the default for modern drives!
 
 ## TLDR
-RAIDZ is only great for sequential reads and writes of big files. An example of that would be a fileserver that mostly hosts big files.  
-For VMs or iSCSI, RAIDZ will not get you the storage efficiency you think you will get, and also it will perform badly. Use mirror instead. It is a pretty long text, but you can jump to the conclusion and the efficiency tables at the end.  
+RAIDZ is only great for sequential reads and writes of large files (>1MB). An example would be a file server that mostly hosts big files.  
+For VMs or iSCSI, RAIDZ will not give you the storage efficiency you think you will get, and it will also perform poorly. Use mirror instead. It's a pretty long text, but you can jump to the conclusion and the efficiency tables at the end.  
 
 ## Introduction and glossary
 Before we start, some ZFS glossary. These are important to understand the examples later on.
@@ -350,8 +350,9 @@ Efficiency tables for different numbers of drives, with 16k or 64k volblocksize,
 
 ## Conclusion
 RAIDZ is different from traditional RAID and often has worse storage efficiency than expected.  
-Bigger volblocksizes offer better space efficiency and compression gains, 
-but will also suffer from read and write amplification and create more fragmentation. 
-Also, keep in mind that all these variants will only write as fast as the slowest disk in the pool.
+You can get better space efficiency and compression gains with a larger volblocksize, 
+but it will comes at the cost of read and write amplification and create higher fragmentation. 
+Remember that all these variants will only write as fast as the slowest disk in the pool.
 Mirrors have a worse storage efficiency but will offer twice the write performance with 4 drives and 4 times the write performance with 8 drives over a RAIDZ pool.  
-Use mirrors for Zvol and RAIDZ for huge, sequential files.
+**Use NVMe (or at least SSD) mirrors for Zvols**  
+**Use  RAIDZ for huge, sequentially written and read files in datasets**
