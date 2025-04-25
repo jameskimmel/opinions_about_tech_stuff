@@ -1,5 +1,3 @@
-This is a draft. Don't read it yet :)
-
 Apple switched to AFPS for their machines. AFPS is a copy on write filesystem.  
 This has possible technical implications. 
 
@@ -30,13 +28,13 @@ So I don't know where the bottleneck is, I just know it is very slow but also ea
 HDD:  
 Lacie Porsche Design 2TB SSD 2,5" HDD with USB 3.0.
 Inital backup time -> 21min
-Second run without any changes -> 
-Third run with a 90% full disk -> 
-conclusion -> 
+Second run without any changes -> 2min 5s
+Third run with a 90% full disk -> n/a
+conclusion -> Even a cheap and slow HDD is way better than my old SMB solution. It is perfectly fine performance wise, although 2min is not nothing when started every hour. 
 
 SSD:  
 Kingston XS1000 1TB SSD with USB 3.0 
 Inital backup time -> 6min 27s
-Second run without any changes -> 
-Third run with a 90% full disk -> 
-conclusion -> 
+Second run without any changes -> 25s
+Third run with a 90% full disk -> n/a
+conclusion -> This is it! This is the perfect solution for a TimeMachine Backup!
