@@ -10,4 +10,4 @@ Beginner's Guide to ZFS:
 - If you need a special vdev, add it before moving data to your pool.
 - Don’t use L2ARC or SLOG from the start. There's a high chance your workload won’t need them. If needed, you can still add them later.
 
-**If you don’t understand a term here (like ARC or blockstorage) read up on it first!
+**If you don’t understand a term here (like ARC or blockstorage) read up on it first!**
