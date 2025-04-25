@@ -1,6 +1,6 @@
 Beginners guide to ZFS:
 
-- Don’t use blockstorage for files, but datasets
+- Don’t use blockstorage for files, instead use datasets
 - Separate files from VM data
 - Don’t use RAIDZ for blockstorage
 - Use RAIDZ2 for big files that are sequentially read and written
