@@ -22,22 +22,24 @@ macMini with a 500GB SSD. The data to backup is roughly 100GB. macOS is 15.4.1
 
 Old TimeMachine setup:  
 My old setup was a TimeMachine backup my TrueNAS system over 10GBit/s SMB. The TrueNAS system has a 48TB pool (8 drives in a RAIDZ2 and special vdev mirror for metadata performance). 
-Inital backup time -> unknown
-Second run without any changes -> 20min
-Third run with a 90% full disk -> can't simulate that
+Inital backup time -> unknown  
+Second run without any changes -> 20min  
+Third run with a 90% full disk -> can't simulate that  
 conclusion -> I don't know why it takes so long. SMB is a complicated beast, maybe there are some bottlenecks there. TrueNAS shows no CPU usage, no disk busy nothing. Same goes for the macMini.  
 So I don't know where the bottleneck is, I just know it is very slow but also easy on the system. 
 
 HDD:  
-Lacie Porsche Design 2TB SSD 2,5" HDD with USB 3.0.
-Inital backup time -> 21min
-Second run without any changes -> 1min 22s
-Third run with a 90% full disk -> 1min 30s
+Lacie Porsche Design 2TB SSD 2,5" HDD with USB 3.0.  
+Inital backup time -> 21min  
+Second run without any changes -> 1min 22s  
+Third run with a 90% full disk -> 1min 30s  
 conclusion -> Even a cheap and slow HDD is way better than my old SMB solution. It is perfectly fine performance wise, although 1min is not nothing when started every hour. 
 
 SSD:  
 Kingston XS1000 1TB SSD with USB 3.0 
-Inital backup time -> 6min 27s
-Second run without any changes -> 23s
-Third run with a 90% full disk -> 25s
+Inital backup time -> 6min 27s  
+Second run without any changes -> 23s  
+Third run with a 90% full disk -> 25s  
 conclusion -> This is it! This is the perfect solution for a TimeMachine Backup!
+
+TLDR: TimeMachine backups to local APFS disks are way faster than to a network drive.
