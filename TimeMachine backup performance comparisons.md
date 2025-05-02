@@ -42,4 +42,4 @@ Second run without any changes -> 23s
 Third run with a 90% full disk -> 25s  
 conclusion -> This is it! This is the perfect solution for a TimeMachine Backup!
 
-TLDR: TimeMachine backups to local APFS disks are way faster than to a network drive.
+**TLDR: TimeMachine backups to local APFS disks are way faster than to a network drive.**
