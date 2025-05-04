@@ -1,8 +1,8 @@
-Apple switched to AFPS for their machines. AFPS is a copy on write filesystem.  
+Apple switched to APFS for their machines. APFS is a copy on write filesystem.  
 This has possible technical implications. 
 
-- Backing up to another AFPS destination (like a TimeMachine Backup disk) could offer huge performance improvements. We could see almost instant backups, just like we see with Snapshots in ZFS. So what performance do we see with AFPS?  
-- In the beginning of AFPS, there were lots of reports about how HDD will perform very poor and AFPS is only suitable for SSDs. It is unclear to me if this was just an intial performance bug or if this has to do with SMR drives behaving poorly with CoW.  
+- Backing up to another APFS destination (like a TimeMachine Backup disk) could offer huge performance improvements. We could see almost instant backups, just like we see with Snapshots in ZFS. So what performance do we see with APFS?  
+- In the beginning of APFS, there were lots of reports about how HDD will perform very poor and APFS is only suitable for SSDs. It is unclear to me if this was just an intial performance bug or if this has to do with SMR drives behaving poorly with CoW.  
 
 So lets find out. To have a comparison, I ran multiple test.  
 First is the inital backup time. This isn't really important IMHO, since this is only done once. 
@@ -11,7 +11,7 @@ This is a pretty important metric, since this simulates the normal behavior of y
 The third run is with the disk being almost full (only 20GB left). For that I will fill up the drive with random date.  
 Some SSDs have some kind of pseudo SLC cache and some SMR HDDs in compination with CoW suffer when not having free space.  
 With that third test we get a more realistic result of how TimeMachine will behave a year down the road when the backup got filled. What this test won't show is how fragmentation effects performance.
-I don't know of a good way to simulate fragmentation and I am also not sure if that even is a big issue for TimeMachine or if it mostly writes sequential. Just like with ZFS, there are no tools to defrag AFPS.  
+I don't know of a good way to simulate fragmentation and I am also not sure if that even is a big issue for TimeMachine or if it mostly writes sequential. Just like with ZFS, there are no tools to defrag APFS.  
 In all these test, I will wait 60mins between test. The reason for that is that SSDs and HDDs sometimes do some interal work to speed things up. In real life we also have 60min between backups where the disks have nothing else to do. 
 For good measure I will throw in my current setup that backups over SMB to a NAS.  
 All tests will be run with a encrypted TimeMachine setup.  
@@ -36,7 +36,7 @@ Third run with a 90% full disk -> 1min 30s
 conclusion -> Even a cheap and slow HDD is way better than my old SMB solution. It is perfectly fine performance wise, although 1min is not nothing when started every hour. 
 
 SSD:  
-Kingston XS1000 1TB SSD with USB 3.0 
+Kingston XS1000 1TB SSD with USB 3.2 Gen 2
 Inital backup time -> 6min 27s  
 Second run without any changes -> 23s  
 Third run with a 90% full disk -> 25s  
