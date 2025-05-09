@@ -105,4 +105,3 @@ Total = 0.798%
 Even though this is the absolute worst case for the mirror scenario, is still lower than the 0.857% of RAIDZ2.
 
 If we compare a “single batch” system with a “two batch” system, the advantage of the two batch is, that you don’t have these extremes when it comes to AFR. That is thanks to drive failures being more spread more out.
-

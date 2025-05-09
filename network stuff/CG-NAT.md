@@ -91,6 +91,3 @@ It is also is less prone to port scanning, because there are to many IPs for att
 
 ### Dual Stack
 Best solution is to get dual stack. Dual stack is a real, none CG-NAT IPv4 plus an IPv6 Prefix.  Then you can connect to your OpenVPN server, no matter what your device on the road is connected to.  
-
-
-

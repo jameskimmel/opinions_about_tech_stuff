@@ -1,13 +1,13 @@
 Beginner's Guide to ZFS:
 
-- Don’t use blockstorage for files! Instead use datasets for files.
+- Don’t use block storage for files! Instead, use datasets for files.
 - Separate your files from VM data.
-- Your VM data is stored in zvols and blockstorage. For blockstorage, use NVMe mirrors (or at least SSDs).
-- Don't use RAIDZ1
-- Never use RAIDZ2 for blockstorage.
+- Your VM data is stored in zvols and block storage. For block storage, use NVMe mirrors (or at least SSDs).
+- Don't use RAIDZ1.
+- Never use RAIDZ2 for block storage.
 - Use RAIDZ2 only for large files that are sequentially read and written.
 - Max out your RAM. You can use RAM for ARC. Set the zfs_arc_max value! For a NAS, 90% is a good value. For a hypervisor, use 50% or as much RAM as you can spare.
 - If you need a special vdev, add it before moving data to your pool.
 - Don’t use L2ARC or SLOG from the start. There's a high chance your workload won’t need them. If needed, you can still add them later.
 
-If you don’t understand a term here (like ARC or blockstorage) read up on it first!
+If you don’t understand a term here (like ARC or block storage), read up on it first!

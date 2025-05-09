@@ -1,5 +1,5 @@
 # The problem with RAIDZ or why you probably won't get the storage efficiency you think you will get.
-As a ZFS rookie, I struggled quiet a bit to figure out what settings I should use for my Proxmox hypervisor. Hopefully, this will help other ZFS rookies. 
+As a ZFS rookie, I struggled quite a bit to figure out what settings I should use for my Proxmox hypervisor. Hopefully, this will help other ZFS rookies. 
 This text focuses on Proxmox, but it generally applies to all ZFS systems.
 
 This entire document assumes an ashift of 12 (4K), which is the default for modern drives!
@@ -21,7 +21,7 @@ ashift sets the sector size, ZFS should use. ashift is a power of 2, so setting 
 A dataset is inside a pool and is like a file system. There can be multiple datasets in the same pool, and each dataset has its own settings like compression, dedup, quota, and many more. They also can have child datasets that by default inherit the parent's settings. Datasets are useful to create a network share or create a mount point for local files. In Proxmox, datasets are mostly used locally for ISO images, container templates, and VZdump backup files.
 
 ### zvol:
-zvols or ZFS volumes are also inside a pool. Rather than mounting as a file system, it exposes a block device under /dev/zvol/poolname/dataset. This allows to back disks of virtual machines or to make it available to other network hosts using iSCSI. In Proxmox, zvols are mostly used for disk images and containers.
+zvols or ZFS volumes are also inside a pool. Rather than mounting as a file system, it exposes a block device under /dev/zvol/poolname/dataset. This allows backing up disks of virtual machines or making it available to other network hosts using iSCSI. In Proxmox, zvols are mostly used for disk images and containers.
 
 ### recordsize:
 Recordsize applies to datasets. ZFS datasets use by default a recordsize of 128KB. It can be set between 512b to 16MB (1MB before openZFS v2.2).
@@ -46,7 +46,7 @@ One stripe has 2 data sectors and 1 parity sector. Each is 4k in size.
 So one stripe has 8k data sectors and a 4k parity sector.  
 To store a 128k file, we need 128k / 4k = 32 data sectors.  
 To store 32 data sectors, each stripe has 2 data sectors, so we need 16 stripes in total.  
-Or you could also say, that to store a 128k file, we need 128k / 8k data sectors = 16 stripes.  
+Or you could also say that to store a 128k file, we need 128k / 8k data sectors = 16 stripes.  
 Each of these stripes consists of two 4k data sectors and a 4k parity sector.  
 In total, we store 128k data sectors (16 stripes * 8k data sectors) and 64k parity sectors (16 stripes * 4k parity sectors).  
 Data sectors + parity sectors = total sectors  
@@ -62,7 +62,7 @@ Now, what happens if the file is smaller than the recordsize of 128? A 20k file?
 
 We do the same steps for our 20k file.  
 To store 20k, we need 20k / 4k = 5 data sectors.  
-To store 5 data sectors, each stripe has 2 data sectors, so we need 2,5 stripes in total.  
+To store 5 data sectors, each stripe has 2 data sectors, so we need 2.5 stripes in total.  
 Half-data stripes are impossible. That is why we need 3 stripes.  
 The first stripe has 8k data sectors and a 4k parity sector.  
 Same for the second stripe, 8k data sectors and a 4k parity sector.  
@@ -82,7 +82,7 @@ This is not what you intuitively would expect. We thought we would get 66.66%!
 
 We do the same steps for a 28k file.  
 To store 28k, we need 28k / 4k = 7 data sectors.  
-To store 7 data sectors, each stripe has 2 data sectors, so we need 3,5 stripes in total.  
+To store 7 data sectors, each stripe has 2 data sectors, so we need 3.5 stripes in total.  
 Half-data stripes are impossible. That is why we need 4 stripes.  
 The first three stripes have 8k data sectors and a 4k parity sector.  
 The fourth stripe is special.  
@@ -100,7 +100,7 @@ We wrote 48k to store a 28k file.
 28k / 48k = 58.33% storage efficiency.  
 This is not what you intuitively would expect. We thought we would get 66.66%!  
 
-What happens if we wanna save a 4k file?  
+What happens if we want to save a 4k file?  
 
 We calculate the same thing for a 4k file.  
 We simply store a 4k data sector on one disk and one parity sector on another disk. In total, we wrote a 4k data sector and a 4k parity sector.  
@@ -164,8 +164,8 @@ We expected a storage efficiency of 80%, but only got 66.66%!
 #### RAIDZ1 with 10 drives
 With 10 drives, we get a stripe 10 drives wide.  
 That 10 drives wide stripe in theory would get us 9 data sectors and one parity sector.  
-A single stripe could thous hold 9 * 4k = 36k.  
-But that is no of no use to us, we only need 16k!  
+A single stripe could thus hold 9 * 4k = 36k.  
+But that is of no use to us, we only need 16k!  
 ZFS will shorten the stripes.  
 For a volblock of 16k, we need one stripe with 4 data sectors and one parity sector.  
 In total, we have four 4k data sectors and one 4k parity sector.  
@@ -180,7 +180,7 @@ We expected a storage efficiency of 90%, but only got 66.66%!
 #### RAIDZ2 with 4 drives
 With 4 drives, we get a stripe 4 drives wide.  
 Each stripe has two 4k data sectors and two 4k parity sectors.  
-For a volblock of 16k, we need two stripe (16k/8k = 2).  
+For a volblock of 16k, we need two stripes (16k/8k = 2).  
 That gets us to 32k in total to store 16k.  
 32k is 8 sectors and that can't be divided by 3 so there is padding needed.  
 We need another padding sector to get to 9 sectors total.  
@@ -311,7 +311,7 @@ But not all stripes have five 4k data sectors (20k) and two 4k parity sectors.
 For a volblock of 64k, we need 3.2 stripes (64k/20k).  
 Three stripes have five 4k data sectors, in total 60k.  
 Three stripes also have two 4k sectors for parity, in total 24k. 
-The fourth stripe has on 4k data sector.  
+The fourth stripe has one 4k data sector.  
 The fourth stripe also has two 4k sectors for parity.  
 In total, we have 16 4k data sectors and eight 4k parity sectors.  
 That gets us to 96k in total to store 64k.  
@@ -351,8 +351,8 @@ Efficiency tables for different numbers of drives, with 16k or 64k volblocksize,
 ## Conclusion
 RAIDZ is different from traditional RAID and often has worse storage efficiency than expected.  
 You can get better space efficiency and compression gains with a larger volblocksize, 
-but it will comes at the cost of read and write amplification and create higher fragmentation. 
+but it will come at the cost of read and write amplification and create higher fragmentation. 
 Remember that all these variants will only write as fast as the slowest disk in the pool.
 Mirrors have a worse storage efficiency but will offer twice the write performance with 4 drives and 4 times the write performance with 8 drives over a RAIDZ pool.  
 **Use NVMe (or at least SSD) mirrors for Zvols**  
-**Use  RAIDZ for huge, sequentially written and read files in datasets**
+**Use RAIDZ for huge, sequentially written and read files in datasets**
