@@ -77,13 +77,11 @@ Sure, the handing out of the IP is a little bit different, but you won’t notic
 It all happens in the background. And sure, IPv6 is a little bit faster. But other than that? 
 There is no difference. You could even argue that IPv4 has become totally meaningless and obsolete, and John could just turn it off.  
 
-**Now let's take a look at other scenarios to find out the differences between IPv4 and IPv6.** 
+**Now let's take a look at use cases to find out the differences between IPv4 and IPv6.**  
 Remember that all these scenarios happen in the alternative universe in the year 2050 without any bad actors and NOT in our timeline! 
-Some things I made a little bit simpler to make the topic less complex. I will completely leave out IPv6 privacy extension, tracking over IP in general, 
-and many other great features of IPv6.  
+Some things I made a little bit simpler to make the topic less complex. I will completely leave out IPv6 privacy extension, tracking over IP in general, shortening IPv6 by using :: and many other great details of IPv6.  
 
 ## Use case 1: John visits sarasblog.com:
-
 John has a friend called Sara that writes her own blog about classic cars. 
 Sara’s ISP is called OldBell. OldBell is a bunch of old network engineers that can't be bothered to implement IPv6. 
 "We used IPv4 for the decades. I don't want to learn something new before I get into my pension." is a common mantra in the company OldBell. 
