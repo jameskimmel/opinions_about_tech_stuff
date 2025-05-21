@@ -90,7 +90,7 @@ Because of that, Saras’ blog is only reachable over IPv4.
 John does not like to enter http://203.0.113.82 to get to Saras’ blog.
 It is very hard to remember that number. 
 That is why we invented DNS. So, instead, John types sarasblog.com into his browser. 
-He does not know if sarasblog.com gets translated to, for example, http://203.0.113.82 or to http://[2001:db8:113:82:0000:0000:0000:0000:0001]
+He does not know if sarasblog.com gets translated to, for example, http://203.0.113.82 or to http://[2001:db8:113:82:0000:0000:0000:0001]
 Can you imagine having to enter that IPv6 by hand? That would be a nightmare! Thank god we have DNS!
 
 Because of that, John does not even realize that he made a connection over IPv4 and not over IPv6. He doesn't enter IPs, he just enters names.
@@ -151,7 +151,7 @@ That is why he creates an A record with his router’s IPv4 198.51.100.54 and an
 Can you spot the problem already? Ask yourself the question, why do we assign for IPv4 the router’s IP and for IPv6 we assign the MacBook’s IP?
 
 Well the problem is that you only got one IPv4 from your ISP. So devices in your network don't have their own public IPv4. 
-Instead they got a link local only IPv4 from the routers DHCP server. For the MacBook this is 192.168.1.2. 
+Instead they got a private IPv4 from the routers DHCP server. For the MacBook this is 192.168.1.2. 
 
 IPv4:
 Let's look at the IPv4 problem from a visitor’s side. John’s friend Arnold wants to visit John’s blog. Arnold types into the URL http://john.com.
