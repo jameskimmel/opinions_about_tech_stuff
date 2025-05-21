@@ -269,11 +269,7 @@ Remember the evil attackers we discussed earlier? How IPv6 won't get scanned, bu
 Since Marco’s PS6 does not need an AAAA record, it only needs some open ports for CoD. 
 
 Here is a crazy idea: What if we open up by default all incoming IPv6 connections on the router? Again, there are no port scans anyway. And the average home user does not have an AAAA record. Marco does not have any AAAA records. And if he does,he/she is knowledgeable to change back the default to block all incoming again. And even if someone is able to find out Marco’s PS6 IP, the PS6 itself also has a firewall that only allows port 4500. So there is no practical downside. 
-Now CoD runs perfectly without any downsides. 
-But you know what, since we want to be extra cautious, we won't allow incoming traffic on dangerous ports like SSH, RDP, HTTP, HTTPS. 
+But as an upside, CoD now runs perfectly. Problem solved!  
+But you know what, since we want to be extra cautious, we won't allow by default incoming traffic on potentially dangerous ports like SSH, RDP, HTTP, HTTPS. 
 
-(BTW, this is again not a made-up scenario. The biggest ISP in Switzerland, Swisscom, did exactly that for consumer routers. They changed the router’s default. It used to be "strict" (block all incoming) and is now "normal" (block all incoming IPv4, allow all incoming IPv6, but with the exception of some "dangerous" ports))
-
-
-
-
+**BTW, this is again not a made-up scenario in a different universe.** This is real life. The biggest ISP in Switzerland, Swisscom, did exactly that for consumer routers. They changed the router’s default. It used to be "strict" (block all incoming) and is now "normal" (block all incoming IPv4, allow all incoming IPv6, but with the exception of some "dangerous" ports). It simply isn't a problem.  
