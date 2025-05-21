@@ -19,9 +19,9 @@ That is why there are no firewalls in the year 2050!
 He gets a router from his ISP. 
 He connects that router to his Optical Termination Outlet (OTO).  
 He gets one single IPv4. 
-That IPv4 is 46.54.15.54.  
+That IPv4 is 198.51.100.54.  
 The router also gets a /48 prefix. 
-That prefix is 1234:1234:1234::/48  
+That prefix is 2001:db8:1234::/48  
 
 ## John goes online
 So far so good. Now he connects his MacBook Air over Wi-Fi
@@ -29,8 +29,8 @@ Now, for both IPv4 and IPv6 some things happen by default.
 
 IPv4: 
 - The router has a DHCPv4 server
-- That server has a range from 192.168.1.2 to 192.168.254 
-- John’s MacBook has the MAC address 00:05:02:41:45:57
+- That server has a range from 192.168.1.2 to 192.168.1.254 
+- John’s MacBook has the MAC address 11:05:02:41:45:57
 - John’s MacBook asks for an IP
 - The router responds with 192.168.1.2 and writes down the 11:05:02:41:45:57
 - John’s MacBook has now the IP 192.168.1.2
@@ -52,9 +52,9 @@ RA:
 - The router has RA (Router advertisement) running.
 - That RA hands out all devices on the link local network, stuff about the network. 
 - RA tells John’s MacBook about network mode, prefix, DNS servers, Gateways and so on. 
-- John’s MacBook now knows that the prefix we have is 1234:1234:1234::/48, what DNS servers we use, what Gateway and so on.
+- John’s MacBook now knows that the prefix we have is 2001:db8:1234::/48, what DNS servers we use, what Gateway and so on.
 - John’s MacBook decides to generate another IPv6 based on that information. 
-- John’s MacBook creates the IPv6 1234:1234:1234:0000:0000:1105:0241:4557
+- John’s MacBook creates the IPv6 2001:db8:1234:0000:0000:1105:0241:4557
 - John’s MacBook asks the network if that IP is already in use
 - Probably not, so John’s MacBook keeps that IP.
 
@@ -87,10 +87,10 @@ Sara’s ISP is called OldBell. OldBell is a bunch of old network engineers that
 "We used IPv4 for the decades. I don't want to learn something new before I get into my pension." is a common mantra in the company OldBell. 
 Because of that, Saras’ blog is only reachable over IPv4. 
 
-John does not like to enter http://16.54.45.82 to get to Saras’ blog.
+John does not like to enter http://203.0.113.82 to get to Saras’ blog.
 It is very hard to remember that number. 
 That is why we invented DNS. So, instead, John types sarasblog.com into his browser. 
-He does not know if sarasblog.com gets translated to, for example, http://16.54.45.82 or to http://[1654:4582:0000:0000:0000:0000:0000:0000]
+He does not know if sarasblog.com gets translated to, for example, http://203.0.113.82 or to http://[2001:db8:113:82:0000:0000:0000:0001]
 Can you imagine having to enter that IPv6 by hand? That would be a nightmare! Thank god we have DNS!
 
 Because of that, John does not even realize that he made a connection over IPv4 and not over IPv6. He doesn't enter IPs, he just enters names.
@@ -147,15 +147,15 @@ John wants to host his own blog. Remember, it is the year 2050, we don't have fi
 He installs an Apache2 Webserver on his MacBook.
 He wants his friend Sara to be able to visit his blog by inserting john.com into her browser.
 
-That is why he creates an A record with his router’s IPv4 46.54.15.54 and an AAAA record with his MacBook’s IPv6 1234:1234:1234:0000:0000:1105:0241:4557.
+That is why he creates an A record with his router’s IPv4 198.51.100.54 and an AAAA record with his MacBook’s IPv6 2001:db8:1234:0000:0000:1105:0241:4557.
 Can you spot the problem already? Ask yourself the question, why do we assign for IPv4 the router’s IP and for IPv6 we assign the MacBook’s IP?
 
 Well the problem is that you only got one IPv4 from your ISP. So devices in your network don't have their own public IPv4. 
-Instead they got a link local only IPv4 from the routers DHCP server. For the MacBook this is 192.168.1.2. 
+Instead they got a private IPv4 from the routers DHCP server. For the MacBook this is 192.168.1.2. 
 
 IPv4:
 Let's look at the IPv4 problem from a visitor’s side. John’s friend Arnold wants to visit John’s blog. Arnold types into the URL http://john.com.
-This gets translated to John’s router’s IPv4 address 46.54.15.54. So Arnold connects to John’s router. And the router has no idea what to do with that traffic. 
+This gets translated to John’s router’s IPv4 address 198.51.100.54. So Arnold connects to John’s router. And the router has no idea what to do with that traffic. 
 
 This is where NAT comes into play: Network Address Translation. 
 We got to the router and created the NAT rule that we want to redirect the incoming traffic to 192.168.1.2. 
@@ -173,8 +173,8 @@ to our NAT table. It could be that we even run out of RAM and NAT totally breaks
 
 IPv6:
 John’s friend Arnold wants to visit John’s blog. Arnold types into the URL http://john.com.
-This gets translated to John’s router IPv6 1234:1234:1234:0000:0000:1105:0241:4557. So Arnold directly connects to John’s MacBook with the webpage.
-http://johnswebcam.com on the other hand gets translated to http://[1234:1234:1234:0000:0000:1111:1111:1111] which is the IPv6 of the webcam.
+This gets translated to John’s router IPv6 2001:db8:1234:0000:0000:1105:0241:4557. So Arnold directly connects to John’s MacBook with the webpage.
+http://johnswebcam.com on the other hand gets translated to http://[2001:db8:1234:0000:0000:1111:1111:1111] which is the IPv6 of the webcam.
 
 Done! That is it. See how simple that is?
 
@@ -183,22 +183,22 @@ Done! That is it. See how simple that is?
 
 ## Use case 4: John does not get a public IPv4.
 We write the year 2060. Unfortunately, the two ISPs OldBell and ModernTelco have run out of IPv4 to assign to their customers. 
-That is why John no longer gets the IPv4 46.54.15.54 for himself. Instead, he has to share that IP. 
+That is why John no longer gets the IPv4 198.51.100.54 for himself. Instead, he has to share that IP. 
 His ISP ModernTelco is implementing carrier-grade NAT or CG-NAT. 
 This means that his ISP is basically doing to him what his John’s router is doing to its clients; putting them behind NAT.
-John gets the IP 10.10.10.1 and his neighbor Marie gets 10.10.10.10.2. 
-Both are behind a router that has the IP 46.54.15.54. 
+John gets the IP 10.10.10.1 and his neighbor Marie gets 10.10.10.2. 
+Both are behind a router that has the IP 198.51.100.54. 
 So now both of them share that IP. This comes with many problems. 
 First of all, performance is very bad. From the internet to John’s MacBook, we now have to traverse two routers or two times NAT. 
 Another problem is that Marie got a virus and because of that is DDoSing classiccars.com. 
-The server classiccars.com is not amused about the DDoS and blocks the IP 46.54.15.54.
-classiccars.com does and can't know that behind 46.54.15.54 there are multiple users. 
+The server classiccars.com is not amused about the DDoS and blocks the IP 198.51.100.54.
+classiccars.com does and can't know that behind 198.51.100.54 there are multiple users. 
 As a result, John can now no longer access classiccars.com. 
 He has become collateral damage. 
 
 But worst of all, his website no longer works. Let's look at it again from a visitor’s point of view. 
 John’s friend Arnold wants to visit John’s blog. Arnold types into the URL http://john.com.
-This gets translated to the ISP router’s IPv4 46.54.15.54. 
+This gets translated to the ISP router’s IPv4 198.51.100.54. 
 So Arnold connects to John’s ISP router. And the router has no idea what to do with that traffic. It can't. How should it now if it has to redirect that traffic to John 10.10.10.1 or his neighbor 10.10.10.2, Marie?
 ModernISP offers no interface to enter NAT based on port. And even if ModernISP would offer that, how would they decide if John or Marie gets port 80?
 
@@ -226,19 +226,19 @@ Or alternatively use some kind of DynDNS.
 ## Use case 5: John wants to access his cam from his internal network.
 
 For IPv4, this is again a PITA. 
-johnswebcam.com gets translated to 46.54.15.54, which his router probably can't handle. And even if it can, it is unnecessary to contact the router when he wants to access something from his own network. 
-So instead, he creates an override rule on his router so that the router’s DNS does not respond with 46.54.15.54 but 192.168.1.4 when he enters johnswebcam.com locally. 
+johnswebcam.com gets translated to 198.51.100.54, which his router probably can't handle. And even if it can, it is unnecessary to contact the router when he wants to access something from his own network. 
+So instead, he creates an override rule on his router so that the router’s DNS does not respond with 198.51.100.54 but 192.168.1.4 when he enters johnswebcam.com locally. 
 
-For IPv6, there is no difference between internal or external IP. The camera’s IP simply is always 1234:1234:1234:0000:0000:1111:1111:1111. So there is no need for DNS override rules. 
+For IPv6, there is no difference between internal or external IP. The camera’s IP simply is always 2001:db8:1234:0000:0000:1111:1111:1111. So there is no need for DNS override rules. 
 
 
 ## In 2070, evil internet users arise.
 
 John bought a Synology NAS in 2070. He forgot to set up a new admin password. So the NAS still uses the default credentials admin and the password admin.
-The NAS runs with the IP 192.168.1.10 and 1234:1234:1234:0000:0000:222:2222:2222 
+The NAS runs with the IP 192.168.1.10 and 2001:db8:1234:0000:0000:222:2222:2222 
 
 Since John has not created any NAT rules yet, there is simply no route to the NAS. So he can't get attacked over IPv4.
-But attackers can attack the NAS over 1234:1234:1234:0000:0000:222:2222:2222.
+But attackers can attack the NAS over 2001:db8:1234:0000:0000:222:2222:2222.
 But there is a caveat. There are so many IPv6 addresses, attackers can't simply brute force scan them. It is simply impossible. 
 But maybe John already created the johnsnas.com record. Then attackers can easily find out. 
 

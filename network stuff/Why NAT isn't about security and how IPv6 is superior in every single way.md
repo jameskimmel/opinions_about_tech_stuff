@@ -29,15 +29,15 @@ Great, there are just a few problems with that. There is now a public DNS record
 Port scanners can also detect that I have opened port 8000 and will try to brute force it.  
 
 Now let’s compare that with IPv6.  
-My ISP gives me a static /48 prefix. Let’s say 2000:1111:1111:1111:/48  
+My ISP gives me a static /48 prefix. Let’s say 2001:db8:1111::/48  
 My NAS gets its own IPv6.  
 Maybe my NAS has IPv6 privacy extension. If that is the case, we get three IPv6 addresses.  
 We use the second IPv6, because that one is (unlike the first one) static and publicly routable (unlike the third one).     
 We could also disable privacy extension instead, but I would not recommend it.  
-Let’s say the NAS IPv6 is: 2000:1111:1111:1111:7e89:dbf4:972a:b685.
-Now I create a firewall rule that allows all traffic from WAN to 2000:1111:1111:1111:7e89:dbf4:972a:b685.
+Let’s say the NAS IPv6 is: 2001:db8:1111:1111:7e89:dbf4:972a:b685.
+Now I create a firewall rule that allows all traffic from WAN to 2001:db8:1111:1111:7e89:dbf4:972a:b685.
 Notice how we did not have to bother with DHCP! There is no DHCP server but my NAS will still get always the same IP.  
-To access my NAS from remote, I simply use a bookmark in my browser or type [2000:1111:1111:1111:7e89:dbf4:972a:b685].  
+To access my NAS from remote, I simply use a bookmark in my browser or type [2001:db8:1111:1111:7e89:dbf4:972a:b685].  
 The brackets tell the browser that this is an IPv6.  
 
 Now, comparing that to IPv4, I have no public DNS record!  
