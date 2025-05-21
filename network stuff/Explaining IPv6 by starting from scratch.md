@@ -209,7 +209,7 @@ And for IPv6? Well, even in the year 2060, we still have plenty. John still gets
 Let that sink in for a moment. In the year 2060, John gets zero, none, nada, nothing, or simply 0 public IPv4 IPs, while he gets 1,208,925,819,614,629,174,706,176 public IPv6 IPs.
 
 
-## Does John have a static IPv4 or static IPv6 prefix?
+## Does John have a static IPv4 or static IPv6?
 Now that John has john.com and johnswebcam.com running, he has a potential problem. What if any of these IPs are not static?
 This isn't really a technical discussion, more of a marketing one. Simply because it has nothing to do with technology.
 So what is the most common case?
