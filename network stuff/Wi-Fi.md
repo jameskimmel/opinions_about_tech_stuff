@@ -52,7 +52,9 @@ The higher the bandwidth, the smaller the range and object penetration. That is 
 
 There will be a cable either way because the Mesh or AP needs power from somewhere. In my opinion, it is in many cases easier to connect an AP or mesh node by PoE (LAN cable that also transmits power from a PoE-capable switch) than by a wall outlet. 
 What most people have a hard time understanding is that an AP or a mesh node is just a repeater. It can only repeat what it received previously. Bad input = bad output. 
-Remember that I think that 2,4 is mostly useless? Well, some manufacturers like Unifi or AVM think so too. That is why they won't offer the repeater getting 2,4GHz as input, only 5GHz. But that gets us to another problem, 5GHz has a pretty limited range. So you have to place it pretty close to your router or use multiple repeaters.
+Remember that I think that 2,4 is mostly useless? Well, some manufacturers like Unifi or AVM think so too. 
+That is why they won't offer the repeater connecting to your router over 2,4GHz, only 5GHz!  
+But that gets us to another problem, 5GHz has a pretty limited range. So you have to place it pretty close to your router or use multiple repeaters.  
 If possible, always use a cable connection.  
 
 *Where should I place my repeater?*
@@ -63,5 +65,5 @@ Let us look at the typical errors I see when people install a mesh node. For sim
 
 What we see is the router on the left and how good the signal quality is in other rooms. 
 Now if we install a repeater in room 3, the signal the repeater gets would be poor. But since the iPhone in the garden is one wall away from that repeater, it would show a good signal. 
-Which is true, it has good signal, but to a repeater that receives poor signal. So in the end how have a poor experience but your iPhone will show everything is great.  
+Which is true, it has good signal, but only to a repeater that itself receives a poor signal. So in the end you have a poor experience but your iPhone will show everything is great.  
 So if we really can't use a cable connection for the repeater we should place it in room 2 or even better in room 1 and another one in room 2 and 3. That way you get good signal everywhere and ok signal in the garden.  Or you could save a lot of money and energy by just installing a wired repeater in room 3 and get good signal everywhere including the garden. 
