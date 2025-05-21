@@ -46,7 +46,7 @@ It is also not great for VoIP because it takes some time to switch between bands
 
 *But the 5GHz-only network does not reach my garden!*
 
-The higher the bandwidth, the smaller the range and object penetration. That is physics. There are two solutions to this problem. You could either install another cable(!) connected extender to expand your range, or you could manually switch to your SunnyGardenIoT and set your device to NOT auto-connect to that Wi-Fi. Otherwise, your device may connect to the slow Wi-Fi inside your home.
+The higher the bandwidth, the smaller the range and object penetration. That is physics. There are two solutions to this problem. You could either install another cable(!) connected extender to expand your range, or you could manually switch to your SunnyGardenIoT and set your device to NOT auto-connect to that Wi-Fi. Otherwise, your device may connect to the slow Wi-Fi inside your home, where there is 5GHz coverage.  
 
 *Why does an extender have to be connected by cable?*
 
