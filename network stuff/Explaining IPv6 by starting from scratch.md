@@ -221,7 +221,7 @@ Again, this isn't something technical and your ISP may differ. But in general, i
 
 In either case, John has to make sure that the internal IPv4 (192.168.1.2) stays static and that the IPv6 prefix and suffix stay static. 
  
-
+Or alternatively use some kind of DynDNS.  
 
 ## Use case 5: John wants to access his cam from his internal network.
 
