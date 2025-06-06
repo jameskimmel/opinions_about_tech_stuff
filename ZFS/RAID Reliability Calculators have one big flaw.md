@@ -1,3 +1,6 @@
+# RAID Reliability Calculators have one big flaw, 
+**and why mirrors often can be more reliable than RAIDZ2**
+
 Most of us have used one of these great RAID calculators.
 https://wintelguy.com/raidmttdl.pl  
 https://jro.io/capacity/
@@ -27,20 +30,26 @@ But the calculator has one big flaw. It calculates the chances of drives failing
 
 2: The drive's annual failure rate is not static. It will probably be the bathtub curve. So in the beginning, the annual failure rate will be slightly higher, while after 5y the annual failure rate will drastically increase due to wearout. The calculator is static.
 
-With these two points in mind, let's revisit our scenario. 
-We buy new drives for our new NAS. We buy four Seagate drives and four WD drives. 
-We build mirrors with one of them in each. 
-For RAIDZ2 it is still one vdev. 
-The Seagate batch we bought has a horrible firmware error. All four of them die after one year. This happens within days or during a resilver. 
-For RAIDZ2 the pool is lost since we lost four drives. 
+With these two points in mind, let's revisit our scenario.  
+We buy new drives for our new NAS. We buy four Seagate drives and four WD drives.   
+We build mirrors with one of them in each.  
+For RAIDZ2 it is still one vdev.  
+The Seagate batch we bought has a horrible firmware error. All four of them die after one year. This happens within days or during a resilver.  
+For RAIDZ2 the pool is lost since we lost four drives.  
 For the mirror everything is fine.  
 
-In another scenario, the Seagate drives are fine, but the WDs have some issues. 8 years from now, they are extremely old. Maybe the helium in the HDD goes bad or the read heads, or the motor. In a homelab scenario you probably don't have hot swap and you need to shut down the system and put an additional spin-up on them. The resilver also puts an additional load on them.
-For whatever reason, three of the WDs fail. 
-For RAIDZ2 the pool is lost since we lost three drives. 
-For the mirror everything is fine.  
+In another scenario, the Seagate drives are fine, but the WDs have some issues. 8 years from now, they are extremely old. Maybe the helium in the HDD goes bad or the read heads, or the motor. In a homelab scenario you probably don't have hot swap and you need to shut down the system and put an additional spin-up on them. The resilver also puts an additional load on them.  
+For whatever reason, three of the WDs fail.  
+For RAIDZ2 the pool is lost since we lost three drives.  
+For the mirror everything is fine.   
 
-I know I don't have any real hard evidence numbers to compare that with the calculator. It is to show that the calculator has its blindspots and is not able to model all variables of a real-world system. And that you really should get drives from different batches :)
+## conclusion and TLDR
+I know I don't have any real hard evidence numbers to compare that with the calculator.  
+It is to show that the calculator has its blindspots and is not able to model all variables of a real-world system. 
+**And that you really should get drives from different batches :)** 
+
+
+
 
 If you wanna dive deeper into these numbers and like to have some fun with assumptions that I just pull out of thin air, 
 [here is what I wrote in the TrueNAS forums]([https://duckduckgo.com](https://forums.truenas.com/t/raid-reliability-calculators-blindspot/5781/12))
