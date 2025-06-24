@@ -1,4 +1,4 @@
-Are you fed up with all the preachy naysayers in the TrueNAS forum?  
+Are you fed up with all the preachy naysayers in forums?  
 Are you a rebel that was born free and is not afraid to take risks?  
 Do you find it sometimes annoying that you always know better than everybody else?  
 
