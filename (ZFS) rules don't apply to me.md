@@ -37,10 +37,12 @@ Pfff idiot. I simply set the volblocksize to 64k. Problem solved.
 
 That is a problem for future me. Right now, it works. If it becomes dogslow a few years from now or if my resilver takes forever, I will come back to the forum to whine about it. But mostly to shit on how bad ZFS is. 
 
-> Keep it simple, stupid. For example, don't use QCOW2 on ZFS. Just follow the defaults unless you really know what you’re doing.
+> KISS! Keep it simple, stupid. For example, don't use QCOW2 on ZFS. Just follow the defaults unless you really know what you’re doing.
 
 I thought you nerds are so clever. Don't you know about nested virtualization? I run a 40TB SMB share from Windows Server. That server is run by TrueNAS. TrueNAS itself is a VM of Proxmox. Don't worry bro, I used passthrough for the disks.  
-If something goes wrong, I expect you nerds to go out of your way to troubleshoot my setup!
+If something goes wrong, I expect you nerds to go out of your way to troubleshoot my setup!  
+
+Pff, KISS! You can kiss my ass! 
 
 
 
