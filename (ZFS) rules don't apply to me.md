@@ -10,7 +10,7 @@ Let's go through some rules these nerds mumble in their stupid forums:
 > Follow hardware requirements
 
 Phah, follow hardware requirements, don't use RAID controllers, don't do that, I hear them whining. To follow hardware requirements, 
-I would have to read. Andrew Tate said that reading makes you stupid and is for loosers. 
+I would have to read. Andrew Tate said that reading makes you stupid and is for losers. 
 
 > Put VMs on mirrors not RAIDZ
 
