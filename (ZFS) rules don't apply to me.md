@@ -23,7 +23,7 @@ Nah, mounting a share in Linux is too much of a hassle. I would rather have my f
 
 > By using block storage on RAIDZ, by using block storage instead of datasets, you run into many issues. Read up on how volblocksize is a static number while record size is a max value. Read up on pool geometry.
 
-Bro, I already told you that reading is for loosers and now you expect me to do math? Hell no!
+Bro, I already told you that reading is for loosers and now you expect me to do pool geometry math? Hell no!
 
 > If you are too lazy to read up on it, just follow these simple rules: Don’t use block storage for files! Instead, use datasets for files. Separate your files from VM data. Your VM data is stored in zvols and block storage. For block storage, use NVMe mirrors (or at least SSDs). Don't use RAIDZ1. Never use RAIDZ2 for block storage. Use RAIDZ2 only for large files that are sequentially read and written.
 
