@@ -186,7 +186,7 @@ In the early days, the default volblocksize was 8k and it was recommended to tur
 Nowadays, LZ4 compression is enabled by default and the default volblocksize is 16k.   
 16k is a good default value that works well for every VM.   
 
-**The main difference between recordsize and datasets is, that this is a fixed and rather small value**
+**The main difference between recordsize and datasets is, that this is a fixed and rather small value**. 
 If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 128k, it will only write multiple 16k chunk blocks. 
 This is very different from datasets, which use record size, which is not a static but a max value!  
 Since "the problem with RAIDZ" especially applies to smaller writes, like you saw in the datatset example above, this problem all of a sudden gets huge with VMs!
@@ -197,7 +197,7 @@ A larger volblocksize is good for mostly sequential workloads and can gain compr
 Smaller volblocksize is good for random workloads, has less IO amplification, and less fragmentation, but will use more metadata and have worse space efficiency.  
 We look at the different volblocksizes and how they behave on different pools.  
 Don't change it unless you have some fixed 64k SQL DB or something similar going on, on a second disk.
-Some people in the forums recommend using 64k on SSDs.
+Some people in the forums recommend using 64k on SSDs, because SSDs won't become slower because of fragmentation. I would probably still advise against it, due to read and write ampflification, and some implications on movability to other systems. I would rather stick with the defaults. 
 
 ### volblocksize 16k
 This is the default size for openZFS since 2.2.  
@@ -429,4 +429,4 @@ but it will come at the cost of read and write amplification and create higher f
 Remember that all these variants will only write as fast as the slowest disk in the pool.
 Mirrors have a worse storage efficiency but will offer twice the write performance with 4 drives and 4 times the write performance with 8 drives over a RAIDZ pool.  
 **Use NVMe (or at least SSD) mirrors for Zvols**  
-**Use RAIDZ for huge, sequentially written and read files in datasets**
+**Use RAIDZ2 for huge, sequentially written and read files in datasets**
