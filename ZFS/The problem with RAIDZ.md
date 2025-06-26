@@ -158,25 +158,32 @@ If you have a 3-wide RAIDZ1 and only write huge files like pictures, movies, and
 That is a good question. Let's look at an example of what would happen if ZFS would not make use of padding. 
 We have this data:
 ![alt text](../images/pad1.png)
+
 Green, yellow and red stripes. The yellow stripe is a ZFS illegal stripe, because it is 3 sectors and 3 / 2 does not work and would need padding. 
 But ok, we made this. 
 Now we delete the yellow file. 
 ![alt text](../images/pad2.png)
+
 We get some free space.
 We write a none illegal blue stripe.
 ![alt text](../images/pad3.png)
+
 Now we have one white sector that is not used. What should we do with it?
 The blue stripe is in this RAIDZ1 the smallest possible write. There is no smaller than two sector writes. So that storage is basically lost, until we delete the red stripe. Nahh, that is bad. So we use padding instead. 
 
 We do the same thing again, but this time with padding. This is how we start:
 ![alt text](../images/pad4.png)
+
 We delete the yellow one. 
 ![alt text](../images/pad5.png)
+
 and write the blue one
 ![alt text](../images/pad6.png)
 
 That way we get two blocks empty, which we could fill with another 4k data write like this in yellow:
 ![alt text](../images/pad7.png)
+
+That is why we need padding.  
 
 ## ZVOL and volblocksize
 For Proxmox we mostly don't use datasets. We use VMs with RAW disks that are stored on a Zvol.  
