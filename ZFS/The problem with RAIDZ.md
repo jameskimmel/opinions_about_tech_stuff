@@ -6,13 +6,14 @@ This entire document assumes an ashift of 12 (4K), which is the default for mode
 
 ## TLDR
 RAIDZ is only great for sequential reads and writes of large files (>1MB). An example would be a file server that mostly hosts big files.  
-For VMs or iSCSI, RAIDZ will not give you the storage efficiency you think you will get, and it will also perform poorly. Use mirror instead. It's a pretty long text, but you can jump to the conclusion and the efficiency tables at the end.  
+For VMs or iSCSI, RAIDZ will not give you the storage efficiency you think you will get, and it will also perform poorly. 
+Use mirror instead. It's a pretty long text, but you can jump to the conclusion and the efficiency tables at the end.  
 
 ## Introduction and glossary
 Before we start, some ZFS glossary. These are important to understand the examples later on.
 
 ### sector size:
-older HDDs used to have a sector size of 512b, while newer HDDs have 4k sectors. SSDs can have even bigger sectors, but their firmware controllers are mostly tuned for 4k sectors. There are still enterprise HDDs that come with 512e, where the "e" stands for emulation. These are not 512b but 4k drives, they only emulate to be 512. For this whole text, I assume that we have drives with 4k sectors.
+older HDDs used to have a sector size of 512b, while newer HDDs have 4k sectors. SSDs can have even bigger sectors, but their firmware controllers are mostly tuned for 4k sectors. There are still enterprise HDDs that come with 512e, where the "e" stands for emulation. These are not 512b but 4k drives, they only emulate to be 512. For this whole text, I assume that we have normal drives with 4k sectors.
 
 ### ashift:
 ashift sets the sector size, ZFS should use. ashift is a power of 2, so setting ashift=12 will result in 4k. Ashift must match your drive's sector size. Extremely likely this will be 12 and also automatically detected.
@@ -21,49 +22,80 @@ ashift sets the sector size, ZFS should use. ashift is a power of 2, so setting 
 A dataset is inside a pool and is like a file system. There can be multiple datasets in the same pool, and each dataset has its own settings like compression, dedup, quota, and many more. They also can have child datasets that by default inherit the parent's settings. Datasets are useful to create a network share or create a mount point for local files. In Proxmox, datasets are mostly used locally for ISO images, container templates, and VZdump backup files.
 
 ### zvol:
-zvols or ZFS volumes are also inside a pool. Rather than mounting as a file system, it exposes a block device under /dev/zvol/poolname/dataset. This allows backing up disks of virtual machines or making it available to other network hosts using iSCSI. In Proxmox, zvols are mostly used for disk images and containers.
+zvols or ZFS volumes are also inside a pool. Rather than mounting as a file system, it exposes a block device under /dev/zvol/poolname/data/vm-100-disk-0 and so on. 
+This is where your Proxmox RAW virtual machine disks are located. You could also make it available to other network hosts using iSCSI. 
 
 ### recordsize:
-Recordsize applies to datasets. ZFS datasets use by default a recordsize of 128KB. It can be set between 512b to 16MB (1MB before openZFS v2.2).
+Recordsize applies to datasets. ZFS datasets use by default a recordsize of 128KB. It it goes up to 16MB (since openZFS v2.2). ZFS dynamically adjusts the actual block size used for storage based on the size of the data being written. So record size is not a static number but a max number. All blocks bigger than the record size will be split up into chunks the size of record size.  
 
 ### volblocksize:
-Zvols have a volblocksize property that is analogous to recordsize.
-Since openZFS v2.2 the default value is 16k. It used to be 8k.
+Zvols have a volblocksize property. Unlike recordsize, this is a static value that defines what voblocksize should be presented to the VM disk. 
+Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox installations. 
 
 ### padding:
-ZFS allocates space on RAIDZ vdevs in even multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3,for RAIDZ3 this would be 3+1=4.
-To avoid these gaps, ZFS will pad out all writes so they’re an even multiple of this p+1 value. Padding is not really writing data onto disks, it just leaves these sectors out.
+Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is to small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
+ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3,for RAIDZ3 this would be 3+1=4. 
+For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄 
+The total number of sectors of every stripe has to be devidable by 3. Otherwise we add parity. For example a 6 stripe wide write is fine, because 6 / 3 = 2.
+A 8 stripe wide write on the other hand does not work, because 8 / 3 = not an even number. 
+We add one parity sector. Now we have 8 + 1 sectors. That equals 9. 9 / 3 works perfectly fine. 
+Padding is not really writing data onto disks, it just leaves these sectors out or reserves them. 
+Trust me, it gets simpler with some real life examples later on. 
 
-With that technical stuff out of the way, let's look at real examples :)
+### LBA: 
+This stands for Logical block addressing. Since we said that we use only 4k drives in this text, a HDD or SSD LBA will always be 4k block in size.
+
+### Compression:
+Compression happens before we write a stripe. If we want to write a 200k file, and it can be compressed down to 160k, we only need to write 160k. LZ4 compression is basically free and without performance impacts. You should not disable it, since it especially helps with compression zeros. For simplicity, when I talk about a 20k write, I mean a write that was 20k after it got compressed. So a 30k file that gets compressed to 20k, in this text I will always label as a "20k write"
+
+With that technical glossary out of the way, let's look at real examples 🙂
 
 ## Dataset
-Datasets only apply to ISOs, container templates, and VZDump and are not really affected by the RAIDZ problem. You can skip this chapter, but maybe it helps with understanding. 
-Let's look at an example of a dataset with the default recordsize of 128k and how that would work. We assume that we want to store a file 128k in size (after compression).
+Datasets apply to ISOs, container templates, and VZDump and are not that affected by the RAIDZ problem. 
+Simply because datasets usually use bigger blocks and it is mostly the small blocks suffering from this storage efficiency issue. 
 
-For a 3-disk wide RAIDZ1, the total stripe width is 3.
+I think it is easier to understand the RAIDZ problem, by looking at datasets first and ZVOL later on. 
 
-One stripe has 2 data sectors and 1 parity sector. Each is 4k in size.  
-So one stripe has 8k data sectors and a 4k parity sector.  
-To store a 128k file, we need 128k / 4k = 32 data sectors.  
-To store 32 data sectors, each stripe has 2 data sectors, so we need 16 stripes in total.  
+Let's look at an example of a 3-disk wide RAIDZ1. The max stripe width obviously can't be bigger than the number of disk. 
+So the max stripe width is 3.  
+
+Now we want to write 16k data.  
+That would look like these yellow stripes:  
+![alt text](../images/2.png)
+
+If you count all the D2 sectors, you relize that we have 4 data sectors. 4 data sectors with 4k are 16k total, just like we wanted. 
+We also have 2 sectors parity. 
+
+As you can see, we simply needed multiple stripes (in this case two) to reach your data goal. 
+
+So how about a 128k write?
+To store a 128k file, we need 128k / 4k = 32 data sectors in total.
+We know that a single stripe has 2 data sectors, so we need 16 stripes in total.  
 Or you could also say that to store a 128k file, we need 128k / 8k data sectors = 16 stripes.  
 Each of these stripes consists of two 4k data sectors and a 4k parity sector.  
+This would look like this blue write:
+![alt text](../images/3.png)
+
 In total, we store 128k data sectors (16 stripes * 8k data sectors) and 64k parity sectors (16 stripes * 4k parity sectors).  
 Data sectors + parity sectors = total sectors  
 128k + 64k = 192k.  
 That means we write 192k to store 128k data.  
-192k is 48 sectors (192 / 4).  
-48 sectors is a multiple of 2, so there is no padding needed.  
+192k is 48 sectors (192 / 4k).  
+48 we can divide by 2, so there is no padding needed.  
 128k / 192k = 66.66% storage efficiency.  
 
 This is a best-case scenario. Just like one would expect from a 3-wide RAID5 or RAIDZ1, you "lose" a third of storage.  
+This works picturesque perfect, because your 3 wide RAIDZ1 pool and 128k writes are a pool geometry match made in heaven. 
 
-Now, what happens if the file is smaller than the recordsize of 128? A 20k file?  
+But what about a 20k file?
 
 We do the same steps for our 20k file.  
 To store 20k, we need 20k / 4k = 5 data sectors.  
-To store 5 data sectors, each stripe has 2 data sectors, so we need 2.5 stripes in total.  
-Half-data stripes are impossible. That is why we need 3 stripes.  
+To store 5 data sectors, when each stripe has 2 data sectors, we need 2.5 stripes in total.  
+Half-data stripes don't exist, instead we use two 2 data sectors stripes and a 1 data sector stripe. 
+That is why we need 3 stripes. This would look like this green stripe:
+![alt text](../images/4.png)
+
 The first stripe has 8k data sectors and a 4k parity sector.  
 Same for the second stripe, 8k data sectors and a 4k parity sector.  
 The third stripe is special.  
@@ -75,25 +107,34 @@ That means we write 32k to store 20k data.
 32k is 8 sectors (32 / 4).  
 8 sectors is a multiple of 2, so there is no padding needed.  
 
-The efficiency has changed. If we calculate all together, we wrote 20k data sectors, 12k parity sectors.  
+But now the efficiency has changed. If we calculate all together, we wrote 20k data sectors, 12k parity sectors.  
 We wrote 32k to store a 20k file.  
 20k / 32k = 62.5% storage efficiency.  
-This is not what you intuitively would expect. We thought we would get 66.66%!  
+This is not what you intuitively would expect. We thought we would get 66.66%! 
+
+Damn you ZFS! But it get's even worse!
 
 We do the same steps for a 28k file.  
 To store 28k, we need 28k / 4k = 7 data sectors.  
 To store 7 data sectors, each stripe has 2 data sectors, so we need 3.5 stripes in total.  
-Half-data stripes are impossible. That is why we need 4 stripes.  
+
+![alt text](../images/5.png)
+
 The first three stripes have 8k data sectors and a 4k parity sector.  
 The fourth stripe is special.  
 We already saved 24k of data in the first two sectors, so we only need to save another 4k.  
 That is why the fourth stripe has a 4k data sector and a 4k parity sector.  
-In total, we store 28k data sectors (3 times 8k from the first three stripes and 4k from the fourth stripe) and 16k parity sectors (4 stripes with 4k).  
+In total, we store 28k data sectors and 16k parity sectors (4 stripes with 4k).  
 28k + 16k = 44k.  
 That means we write 44k to store 28k data.  
 44k is 11 sectors (44 / 4).  
 11 sectors is not a multiple of 2, so there is padding needed.  
-We need an extra 4k padding sector to get 12 sectors in total.  
+Damn, what does that mean?  
+We add an extra 4k padding sector to get 12 sectors in total.  
+12 / 2 works. 
+So it will look like this:
+![alt text](../images/6.png)
+Why that is, we take a look in the next chapter. For now, we just accept it.  
 
 The efficiency has changed again. If we calculate all together, we wrote 28k data sectors, 16k parity sectors, and one 4k padding sector.  
 We wrote 48k to store a 28k file.  
@@ -104,26 +145,66 @@ What happens if we want to save a 4k file?
 
 We calculate the same thing for a 4k file.  
 We simply store a 4k data sector on one disk and one parity sector on another disk. In total, we wrote a 4k data sector and a 4k parity sector.  
+![alt text](../images/7.png)
 We wrote 8k in sectors to store a 4k file.  
 4k / 8k = 50% storage efficiency.  
 
-This is the same storage efficiency we would expect from a mirror!  
+This is the same storage efficiency we would expect from a mirror!  Holy shit, that is bad!
 
 **Conclusion for datasets:**  
-If you have a 3-wide RAIDZ1 and only write huge files like pictures, movies, and songs, the efficiency loss gets negligible. For 4k files, RAIDZ1 only offers the same storage efficiency as mirror.  
+If you have a 3-wide RAIDZ1 and only write huge files like pictures, movies, and songs, the efficiency loss gets negligible. For smaller files it isn't great and for 4k files, RAIDZ1 only offers the same storage efficiency as mirror.  
+
+## Why do we need padding?
+That is a good question. Let's look at an example of what would happen if ZFS would not make use of padding. 
+We have this data:
+![alt text](../images/pad1.png)
+
+Green, yellow and red stripes. The yellow stripe is a ZFS illegal stripe, because it is 3 sectors and 3 / 2 does not work and would need padding. 
+But ok, we made this. 
+Now we delete the yellow file. 
+![alt text](../images/pad2.png)
+
+We get some free space.
+We write a none illegal blue stripe.
+![alt text](../images/pad3.png)
+
+Now we have one white sector that is not used. What should we do with it?
+The blue stripe is in this RAIDZ1 the smallest possible write. There is no smaller than two sector writes. So that storage is basically lost, until we delete the red stripe. Nahh, that is bad. So we use padding instead. 
+
+We do the same thing again, but this time with padding. This is how we start:
+![alt text](../images/pad4.png)
+
+We delete the yellow one. 
+![alt text](../images/pad5.png)
+
+and write the blue one
+![alt text](../images/pad6.png)
+
+That way we get two blocks empty, which we could fill with another 4k data write like this in yellow:
+![alt text](../images/pad7.png)
+
+That is why we need padding.  
 
 ## ZVOL and volblocksize
-For Proxmox we mostly don't use datasets though. We use VMs with RAW disks that are stored on a Zvol.  
+For Proxmox we mostly don't use datasets. We use VMs with RAW disks that are stored on a Zvol.  
 For Zvols and their fixed volblocksize, it gets more complicated.  
 
-In the early days, the default volblocksize was 8k and it was recommended to turn off compression. Until very recently (2024) Proxmox used 8k with compression as default.
-Nowadays, it is recommended to enable compression and the current default is 16k since OpenZFS v2.2. Some people in the forum even recommend going as high as 64k on SSDs.
+In the early days, the default volblocksize was 8k and it was recommended to turn off compression.  
+Nowadays, LZ4 compression is enabled by default and the default volblocksize is 16k.   
+16k is a good default value that works well for every VM.   
+
+**The main difference between recordsize and datasets is, that this is a fixed and rather small value**. 
+If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 128k, it will only write multiple 16k chunk blocks. 
+This is very different from datasets, which use record size, which is not a static but a max value!  
+Since "the problem with RAIDZ" especially applies to smaller writes, like you saw in the datatset example above, this problem all of a sudden gets huge with VMs!
 
 In theory, you want to have writes that exactly match your volblocksize.  
 For MySQL or MariaDB, this would be 16k. But because you can't predict compression, and compression works very well for stuff like MySQL, you can't predict the size of the writes.  
 A larger volblocksize is good for mostly sequential workloads and can gain compression efficiency.  
 Smaller volblocksize is good for random workloads, has less IO amplification, and less fragmentation, but will use more metadata and have worse space efficiency.  
 We look at the different volblocksizes and how they behave on different pools.  
+Don't change it unless you have some fixed 64k SQL DB or something similar going on, on a second disk.
+Some people in the forums recommend using 64k on SSDs, because SSDs won't become slower because of fragmentation. I would probably still advise against it, due to read and write ampflification, and some implications on movability to other systems. I would rather stick with the defaults. 
 
 ### volblocksize 16k
 This is the default size for openZFS since 2.2.  
@@ -355,4 +436,4 @@ but it will come at the cost of read and write amplification and create higher f
 Remember that all these variants will only write as fast as the slowest disk in the pool.
 Mirrors have a worse storage efficiency but will offer twice the write performance with 4 drives and 4 times the write performance with 8 drives over a RAIDZ pool.  
 **Use NVMe (or at least SSD) mirrors for Zvols**  
-**Use RAIDZ for huge, sequentially written and read files in datasets**
+**Use RAIDZ2 for huge, sequentially written and read files in datasets**
