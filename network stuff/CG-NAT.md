@@ -12,9 +12,9 @@ Beware, just because your IP is not in that range, does not mean that you don't 
 You also need to run test2 to rule that out.  
 
 ### Test2: Based on hops
-You can also check if you have CG-NAT based on how many hops it takes to reach your IPv4. 
-If it takes one hop, you don't have CG-NAT. 
-If it takes two hops, you have CG-NAG. 
+You can also check if you have CG-NAT based on how many hops it takes to reach your IPv4.  
+If it takes **one** hop, you **don't have CG-NAT**.  
+If it takes **two** hops, you **unfortunately do have CG-NAT**.  
 
 Use one of the pages above to find out what your IPv4 is.  
 
