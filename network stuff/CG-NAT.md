@@ -20,9 +20,19 @@ Use one of the pages above to find out what your IPv4 is.
 
 On Windows, start PowerShell and insert the command "tracert -4" followed by your IPv4.  
 Linux or macOS can use "traceroute -I" instead.  
-So if for example your IPv4 is 215.84.156.8 you issue the command:  
+If for example your IPv4 is 215.84.156.8, simply use this command:  
 tracert -4 215.84.156.8
 
+See how many hops it takes. 
+Example of linux output without CG-NAT and only one single hop:  
+```
+1  215.84-156-8.reversedns.myISP.com (215.84.156.8)  10.596 ms  3.576 ms  3.481 ms
+```
+Example of linux output with CG-NAT and two hops:  
+```
+1  215.84.156.7                                      10.596 ms  3.576 ms  3.481 ms
+2  215.84-156-8.reversedns.myISP.com (215.84.156.8)  10.596 ms  3.576 ms  3.481 ms
+```
 Sometimes your router also gets included in these hops. If your first hop is something like 192.168.X.X or 172.16.X.X, ignore that line and don't count it as a hop!
 
 ## Why should I care?
@@ -61,8 +71,8 @@ NAT can behave pretty wonky on consumer routers.
 
 NAT is a workaround for an old problem. In the beginning of the internet, you only had one single computer that was directly connected to your modem. Or maybe you did not even had an external modem, because your Laptop or PC had in integrated modem. There was no need for multiple IPs. When people started to have multiple devices in their homes, ISPs did not start handing out multiple IPv4. Instead you we put all devices behind one single IPv4, behind a router that does NAT if needed.  
 
-BTW: That problem is solved with IPv6. Instead of getting only a single IPv4 from your ISP for all your devices, you get IPv6 prefix. Prefixes can be of different sizes but even the smallest /64 prefix offers you billions of IPs.  
-That way every device can get its own public IPv6.  
+BTW: That problem is solved with IPv6. Instead of getting only a single IPv4 from your ISP for all your devices, you get an IPv6 prefix. Prefixes can be of different sizes, but even the smallest /64 prefix offers you billions of IPs. But more common is the bigger /56 or even /48 prefix.  
+That way every device can get its own public IPv6 and does not have to share one single public IPv4. 
 
 
 ## What is CG-NAT?
