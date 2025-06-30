@@ -14,3 +14,6 @@ This is how it behaves when using a pretty basic config (IPv4 tunnel and IPv4 in
 | not set      |  not set       | 0.0.0.0/0    |   no                     | no                       | no       | no                        |  no                                       | no                               |
 
 
+Conclusions:
+- There is no way to get DNS working on both sides. Either only your home network or only your remote network can do DNS.
+- The search domain setting does nothing if you specify the allowed IPs, only if you set it to 0.0.0.0/0
