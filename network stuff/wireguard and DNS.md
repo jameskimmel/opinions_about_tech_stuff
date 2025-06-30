@@ -1,4 +1,4 @@
-DNS and Wireguard is strange.
+DNS and Wireguard is complicated. 
 
 This is how it behaves when using a pretty basic config (IPv4 tunnel and IPv4 interface address).
 
