@@ -44,12 +44,12 @@ Third run with a 90% full disk -> 25s
 Conclusion -> This is it! This is the perfect solution for a TimeMachine backup!
 
 **TLDR: TimeMachine backups to an external disk is way faster than SMB!**  
-There is no big difference between SSD or HDD. At least not initally with no fragmentation. It could be that HDDs suffer down the line. 
+SMB is very slow, way slower than external disks. There is not a huge difference between SSD or HDD. At least not initally with no fragmentation. It could be that HDDs suffer down the line. 
 
-**Even external drives with APFS perform poor, considering the CoW nature**  
+**External drives with APFS perform poor, considering their CoW nature**  
 I haven't found any documentation on if APFS is even capable of sending snapshots, so it could be that Time Machine is not using them. That would explain the rather poor performance compared to other CoW filesystems like ZFS. 
 
-**Performance on SMB is poor**  
+**Performance on SMB is very poor**  
 According to TrueNAS forums, it also seems like TimeMachine is using sync writes. On normal HDDs, this could have a very bad performance impact. Other workaround seem to be to turn off smb signing and disabling some TCP acks. I would not feel comftable using these hacks.
 
 
