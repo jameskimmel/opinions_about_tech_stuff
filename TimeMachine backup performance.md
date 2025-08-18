@@ -1,3 +1,8 @@
+Have to completly rewrite this. 
+Turns out SMB implementation of CORE was the problem. 
+
+
+
 Apple switched to APFS for their machines. 
 APFS is a copy-on-write filesystem.  
 
@@ -50,7 +55,24 @@ SMB is very slow, way slower than external disks. There is not a huge difference
 I haven't found any documentation on if APFS is even capable of sending snapshots, so it could be that Time Machine is not using them. That would explain the rather poor performance compared to other CoW filesystems like ZFS. 
 
 **Performance on SMB is very poor**  
-According to TrueNAS forums, it also seems like TimeMachine is using sync writes. On normal HDDs, this could have a very bad performance impact. Other workaround seem to be to turn off smb signing and disabling some TCP acks. I would not feel comftable using these hacks.
+According to TrueNAS forums, it also seems like TimeMachine is using sync writes. On normal HDDs, this could have a very bad performance impact. 
+
+**Why is performance so poor over SMB?**
+Is really TimeMachine doing sync for everything the problem?  
+I tried to hunt this down by creating a new and fresh TrueNAS SCALE installation with one single HDD as backup destination. All settings left to default, but turned sync off. By that, TrueNAS is now lying to my macMini about sync writes. 
+
+The inital backup (with sync disabled) was done in 50min.  
+
+Even after multiple runs, took roughly 30 seconds for a second run. Wait what? Now we are at speed levels of local disks?! What happened?
+Well this time we used SCALE (which is based on Linux) instead of Core (which is an older version based on FreeBSD). 
+Maybe something in the SMB implementation of SCALE is way better!.
+
+
+What happens if we add 10'000 files with 50KB?
+
+With sync off it took:
+With sync onn it took:
 
 
 
+Don't forget ARC hit ratio
