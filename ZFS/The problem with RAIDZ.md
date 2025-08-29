@@ -36,9 +36,9 @@ Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox i
 Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is to small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
 ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3,for RAIDZ3 this would be 3+1=4. 
 For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄 
-The total number of sectors of every stripe has to be devidable by 3. Otherwise we add parity. For example a 6 stripe wide write is fine, because 6 / 3 = 2.
+The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding. For example a 6 stripe wide write is fine, because 6 / 3 = 2.
 A 8 stripe wide write on the other hand does not work, because 8 / 3 = not an even number. 
-We add one parity sector. Now we have 8 + 1 sectors. That equals 9. 9 / 3 works perfectly fine. 
+We add one padding sector. Now we have 8 + 1 sectors. That equals 9. 9 / 3 works perfectly fine. 
 Padding is not really writing data onto disks, it just leaves these sectors out or reserves them. 
 Trust me, it gets simpler with some real life examples later on. 
 
