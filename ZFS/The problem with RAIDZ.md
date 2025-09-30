@@ -32,6 +32,8 @@ Recordsize applies to datasets. ZFS datasets use by default a recordsize of 128K
 Zvols have a volblocksize property. Unlike recordsize, this is a static value that defines what voblocksize should be presented to the VM disk. 
 Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox installations. 
 
+**This is  important to understand**. Since volblocksize is a static value, and that 16k is the default for Proxmox VMs, all data will be written in 16k blocks. So if you have a 1TB Windows Server VM that only has huge files like movies in it, that behaves exactly the same as many, many small 16k text files that have a combined size of 1TB. This is a huge downside of zvols over datasets, since you are forcing your data into small blocks that might suffer from the "RAIDZ problem". This is why you should use mirrors for Zvols. 
+
 ### padding:
 Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is to small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
 ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3,for RAIDZ3 this would be 3+1=4. 
@@ -194,9 +196,9 @@ Nowadays, LZ4 compression is enabled by default and the default volblocksize is 
 16k is a good default value that works well for every VM.   
 
 **The main difference between recordsize and datasets is, that this is a fixed and rather small value**. 
-If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 128k, it will only write multiple 16k chunk blocks. 
+If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 1MB, it will write multiple 16k chunk blocks. 
 This is very different from datasets, which use record size, which is not a static but a max value!  
-Since "the problem with RAIDZ" especially applies to smaller writes, like you saw in the datatset example above, this problem all of a sudden gets huge with VMs!
+Since "the problem with RAIDZ" especially applies to smaller writes, like you saw in the datatset example above, this problem all of a sudden gets huge with VMs! Because now we force every write to be only 16k in size.   
 
 In theory, you want to have writes that exactly match your volblocksize.  
 For MySQL or MariaDB, this would be 16k. But because you can't predict compression, and compression works very well for stuff like MySQL, you can't predict the size of the writes.  
