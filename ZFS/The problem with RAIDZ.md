@@ -205,7 +205,7 @@ For MySQL or MariaDB, this would be 16k. But because you can't predict compressi
 A larger volblocksize is good for mostly sequential workloads and can gain compression efficiency.  
 Smaller volblocksize is good for random workloads, has less IO amplification, and less fragmentation, but will use more metadata and have worse space efficiency.  
 We look at the different volblocksizes and how they behave on different pools.  
-Don't change it unless you have some fixed 64k SQL DB or something similar going on, on a second disk.
+I would not recommend you to change it from the default 16k, unless you have some fixed 64k SQL DB or something similar on a second disk going on. A normal Windows VM will have many read and writes that are smaller than 64k.  
 Some people in the forums recommend using 64k on SSDs, because SSDs won't become slower because of fragmentation. I would probably still advise against it, due to read and write ampflification, and some implications on movability to other systems. I would rather stick with the defaults. 
 
 ### volblocksize 16k
@@ -434,8 +434,11 @@ Efficiency tables for different numbers of drives, with 16k or 64k volblocksize,
 ## Conclusion
 RAIDZ is different from traditional RAID and often has worse storage efficiency than expected.  
 You can get better space efficiency and compression gains with a larger volblocksize, 
-but it will come at the cost of read and write amplification and create higher fragmentation. 
-Remember that all these variants will only write as fast as the slowest disk in the pool.
-Mirrors have a worse storage efficiency but will offer twice the write performance with 4 drives and 4 times the write performance with 8 drives over a RAIDZ pool.  
+but it will come at the cost of read and write amplification and more fragmentation. 
+Performance and resilver times will be worse than mirrors.  
+Mirrors have a worse storage efficiency but that is totally worth it. Store your VMs on mirrors and offload VM data  
+to datasets. Even RAIDZ datasets are fine. Not only does that help with compression, storage efficiency,  
+you also get smaller VM disks which are easier to snapshot and send, backup, move and so on. 
+Don't be that guy that has a 16TB Windows Server VM disk, just to host Plex :)  
 **Use NVMe (or at least SSD) mirrors for Zvols**  
 **Use RAIDZ2 for huge, sequentially written and read files in datasets**
