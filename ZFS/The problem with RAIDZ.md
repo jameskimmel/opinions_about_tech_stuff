@@ -36,16 +36,16 @@ Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox i
 
 ### padding:
 Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is to small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
-ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3,for RAIDZ3 this would be 3+1=4. 
+ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3, for RAIDZ3 this would be 3+1=4. 
 For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄 
-The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding. For example a 6 stripe wide write is fine, because 6 / 3 = 2.
+The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding. For example a 6 sector wide stripe is fine, because 6 / 3 = 2.
 A 8 stripe wide write on the other hand does not work, because 8 / 3 = not an even number. 
 We add one padding sector. Now we have 8 + 1 sectors. That equals 9. 9 / 3 works perfectly fine. 
 Padding is not really writing data onto disks, it just leaves these sectors out or reserves them. 
 Trust me, it gets simpler with some real life examples later on. 
 
 ### LBA: 
-This stands for Logical block addressing. Since we said that we use only 4k drives in this text, a HDD or SSD LBA will always be 4k block in size.
+This stands for Logical block addressing. This basically the numbering of the hard drive sectors. Since we said that we use only 4k drives in this text, a HDD or SSD LBA will always be a 4k sectors.
 
 ### Compression:
 Compression happens before we write a stripe. If we want to write a 200k file, and it can be compressed down to 160k, we only need to write 160k. LZ4 compression is basically free and without performance impacts. You should not disable it, since it especially helps with compression zeros. For simplicity, when I talk about a 20k write, I mean a write that was 20k after it got compressed. So a 30k file that gets compressed to 20k, in this text I will always label as a "20k write"
@@ -56,7 +56,7 @@ With that technical glossary out of the way, let's look at real examples 🙂
 Datasets apply to ISOs, container templates, and VZDump and are not that affected by the RAIDZ problem. 
 Simply because datasets usually use bigger blocks and it is mostly the small blocks suffering from this storage efficiency issue. 
 
-I think it is easier to understand the RAIDZ problem, by looking at datasets first and ZVOL later on. 
+I think it is easier to understand the RAIDZ problem, by looking at datasets first and Zvol later on. Because the problem is the same, Zvols are only more prone to that problem.  
 
 Let's look at an example of a 3-disk wide RAIDZ1. The max stripe width obviously can't be bigger than the number of disk. 
 So the max stripe width is 3.  
