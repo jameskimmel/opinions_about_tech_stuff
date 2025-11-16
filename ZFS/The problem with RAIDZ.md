@@ -304,7 +304,7 @@ It also behaves exactly as with 6 drives.
 Each stripe has four 4k data blocks and two 4k parity blocks.  
 For a volblock of 16k, we need one stripe (16k/16k = 1).  
 That gets us to 24k in total to store 16k.  
-We expected a storage efficiency of 80%, but only got 66%!  
+We expected a storage efficiency of 80%, but only got 66.66%!  
 
 ### volblocksize 64k
 Some users in the forums recommend 64k on SSDs.  
@@ -427,7 +427,7 @@ Efficiency tables for different numbers of drives, with 16k or 64k volblocksize,
 ## RAIDZ2
 |          | 4 drives | 5 drives | 6 drives   | 7 drives | 8 drives | 9 drives | 10 drives | 11 drives | 12 drives | 13 drives | 14 drives | 15 drives | 16 drives | 18 drives  |
 |----------|----------|----------|------------|----------|----------|----------|-----------|-----------|-----------|-----------|-----------|-----------|-----------|------------|
-| 16k      | 44.44%   | 44.44%   | **66.66%** | 66%      | 66%      | 66%      | 66%       | 66%       | 66%       | 66%       | 66%       | 66%       | 66%       | 66%        |
+| 16k      | 44.44%   | 44.44%   | **66.66%** | 66.66%      | 66.66%      | 66.66%      | 66.66%       | 66.66%       | 66.66%       | 66.66%       | 66.66%       | 66.66%       | 66.66%       | 66.66%        |
 | 64k      | 48.48%   | 53.33%   | **66.66%** | 66.66%   | 66.66%   | 66.66%   | 76.19%    | 76.19%    | 76.19%    | 76.19%    | 76.19%    | 76.19%    | 76.19%    | **88.88%** |
 | expected | 50%      | 60%      | **66.66%** | 71.42%   | 75%      | 77.77%   | 80%       | 81.81%    | 83.33%    | 84.61%    | 85.71%    | 87.5%     | 88.23%    | **88.88%** |
 
