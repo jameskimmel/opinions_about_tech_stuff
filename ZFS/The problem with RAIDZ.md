@@ -35,7 +35,7 @@ Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox i
 **This is  important to understand**. Since volblocksize is a static value, and that 16k is the default for Proxmox VMs, all data will be written in 16k blocks. So if you have a 1TB Windows Server VM that only has huge files like movies in it, that behaves exactly the same as many, many small 16k text files that have a combined size of 1TB. This is a huge downside of zvols over datasets, since you are forcing your data into small blocks that might suffer from the "RAIDZ problem". This is why you should use mirrors for Zvols. 
 
 ### padding:
-Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is to small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
+Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is too small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
 ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3, for RAIDZ3 this would be 3+1=4. 
 For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄 
 The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding. For example a 6 sector wide stripe is fine, because 6 / 3 = 2.
