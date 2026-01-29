@@ -67,3 +67,6 @@ https://psirt.global.sonicwall.com/vuln-detail/SNWLID-2025-0002
 
 - Solarwinds using an outdated and vulnerable version of OpenSSL
 https://www.heise.de/news/Solarwinds-Update-schliesst-teils-kritische-Luecken-in-Platform-10278244.html
+
+- eScan update servers compromised, resulted in deployment of multi-stage malware to enterprise and consumer endpoints globally.
+https://www.morphisec.com/blog/critical-escan-threat-bulletin/
