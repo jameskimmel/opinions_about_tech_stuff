@@ -12,8 +12,7 @@ Now let’s look at a PLP SSD. This SSD will report back to the system that a sy
 It is because the drive has PLP. PLP is a combination of firmware and hardware, but basically there are capacitors that help the drive finish the write even when the power is gone. 
 
 So no, PLP is NOT added security. PLP protects the "lying about cache" part, a "problem" that the drive created for itself to gain performance. 
-Saying that PLP is "added security" is like putting a turbo on your engine and controlling it via software and then claiming you added security to your engine.  
-No, you protected your engine from a source of failure that wasn't there to begin with.  
+Saying that PLP is "added security" is like jumping out of a plane and claming that a parachute is added security. It also does no make jumping out of a plane more secure than walking on the sidewalk.  
 
 With that knowledge, it is easy to understand why non-PLP perform so poorly compared to PLP drives. 
 Take a look at the Samsung 850 EVO and compare that to the Intel S3510.
