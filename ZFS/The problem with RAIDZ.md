@@ -121,7 +121,7 @@ That means we write 32k to store 20k data.
 32k is 8 sectors (32 / 4).  
 8 sectors is a multiple of 2, so there is no padding needed.  
 
-Disclaimer: This is a slight simplification. Like I said in the beginning, we ignore compression in this doc. But in reality, all these three stripes would be the same 12k size, because the stripe size can be differnt for different files, but not for a single file itself. So for this single 20k file, we would have 3 stripes, that are each 3 sectors long. The last stripe would conist of P1 + D1 and another D1 full of zeros. Which then in return can be compressed to nothing. So after compression, we then get exactly again what we have here in this picture. I know this is a little bit complicated, if you don't get it, just ignore it for now and read it again at the end.
+Disclaimer: This is a slight simplification. Like I said in the beginning, we ignore compression in this doc. But in reality, all these three stripes would be the same 12k or 3 sectors width, because while the stripe width can be different for different files, it can't be for a single file itself. So for this single 20k file, we would have 3 stripes, that are each 3 sectors long. The last stripe would consists of P1 + D1 and another D1 full of zeros. Which then in return can be compressed to nothing. So after compression, we then get exactly again what we have here in this picture. I know this is a little bit complicated, if you don't get it, just ignore it for now and read it again at the end.
 
 But now the efficiency has changed. If we calculate all together, we wrote 20k data sectors, 12k parity sectors.  
 We wrote 32k to store a 20k file.  
