@@ -5,8 +5,8 @@ This text focuses on Proxmox, but it generally applies to all ZFS systems.
 This entire document assumes an ashift of 12 (4K), which is the default for modern drives!
 
 ## TLDR
-RAIDZ is only great for sequential reads and writes of large files (>1MB). An example would be a file server that mostly hosts big files.  
-For VMs or iSCSI, RAIDZ will not give you the storage efficiency you think you will get, and it will also perform poorly. 
+RAIDZ is only great for sequential reads and writes of large files (+128k). An example would be a file server that mostly hosts big files.  
+For VMs and for small files, RAIDZ will not give you the storage efficiency you think you will get, and it will also perform poorly. 
 Use mirror instead. It's a pretty long text, but you can jump to the conclusion and the efficiency tables at the end.  
 
 ## Introduction and glossary
@@ -19,11 +19,12 @@ older HDDs used to have a sector size of 512b, while newer HDDs have 4k sectors.
 ashift sets the sector size, ZFS should use. ashift is a power of 2, so setting ashift=12 will result in 4k. Ashift must match your drive's sector size. Extremely likely this will be 12 and also automatically detected.
 
 ### dataset:
-A dataset is inside a pool and is like a file system. There can be multiple datasets in the same pool, and each dataset has its own settings like compression, dedup, quota, and many more. They also can have child datasets that by default inherit the parent's settings. Datasets are useful to create a network share or create a mount point for local files. In Proxmox, datasets are mostly used locally for ISO images, container templates, and VZdump backup files.
+A dataset is inside a pool and is like a file system or folder. There can be multiple datasets in the same pool, and each dataset has its own settings like compression, dedup, quota, and many more. They also can have child datasets that by default inherit the parent's settings. Datasets are useful to create a network share or create a mount point for local files. In Proxmox, datasets are mostly used locally for ISO images, container templates, and VZdump backup files.
 
-### zvol:
+### Zvol:
 zvols or ZFS volumes are also inside a pool. Rather than mounting as a file system, it exposes a block device under /dev/zvol/poolname/data/vm-100-disk-0 and so on. 
-This is where your Proxmox RAW virtual machine disks are located. You could also make it available to other network hosts using iSCSI. 
+This is where your Proxmox RAW virtual machine disks are located. You could also make it available to other network hosts using iSCSI.  
+So unlike the datasets from above, these are blockstorage.
 
 ### recordsize:
 Recordsize applies to datasets. ZFS datasets use by default a recordsize of 128KB. It it goes up to 16MB (since openZFS v2.2). ZFS dynamically adjusts the actual block size used for storage based on the size of the data being written. So record size is not a static number but a max number. All blocks bigger than the record size will be split up into chunks the size of record size.  
@@ -35,11 +36,13 @@ Since openZFS v2.2 the default value is 16k. It used to be 8k on older Proxmox i
 **This is  important to understand**. Since volblocksize is a static value, and that 16k is the default for Proxmox VMs, all data will be written in 16k blocks. So if you have a 1TB Windows Server VM that only has huge files like movies in it, that behaves exactly the same as many, many small 16k text files that have a combined size of 1TB. This is a huge downside of zvols over datasets, since you are forcing your data into small blocks that might suffer from the "RAIDZ problem". This is why you should use mirrors for Zvols. 
 
 ### padding:
-Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is too small to ever be used. That is why ZFS reserves some padding to make such situation impossible.
-ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3, for RAIDZ3 this would be 3+1=4. 
-For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄 
-The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding. For example a 6 sector wide stripe is fine, because 6 / 3 = 2.
-A 8 stripe wide write on the other hand does not work, because 8 / 3 = not an even number. 
+Since ZFS does not use fixed sized stripes (explained later on), we could potentially run into a situation where we have empty sectors inbetween data, that is too small to ever be used. That is why ZFS reserves some padding to make such situation impossible.  
+ZFS requieres multiples of p+1 sectors to prevent unusable-small gaps on the disk. 
+p is the number of parity, so for RAIDZ1 this would be 1+1=2, for RAIDZ2 this would be 2+1=3, for RAIDZ3 this would be 3+1=4.  
+For example, if you use a RAIDZ2, you want a multiple of (p + 1) or (2 + 1). In the first class I learned that this equals 3 😄  
+The total number of sectors of every stripe has to be devidable by 3. Otherwise we add padding.  
+For example a 6 sector wide stripe is fine, because 6 / 3 = 2.  
+A 8 stripe wide write on the other hand does not work, because 8 / 3 = not an even number.  
 We add one padding sector. Now we have 8 + 1 sectors. That equals 9. 9 / 3 works perfectly fine. 
 Padding is not really writing data onto disks, it just leaves these sectors out or reserves them. 
 Trust me, it gets simpler with some real life examples later on. 
@@ -48,15 +51,24 @@ Trust me, it gets simpler with some real life examples later on.
 This stands for Logical block addressing. This basically the numbering of the hard drive sectors. Since we said that we use only 4k drives in this text, a HDD or SSD LBA will always be a 4k sectors.
 
 ### Compression:
-Compression happens before we write a stripe. If we want to write a 200k file, and it can be compressed down to 160k, we only need to write 160k. LZ4 compression is basically free and without performance impacts. You should not disable it, since it especially helps with compression zeros. For simplicity, when I talk about a 20k write, I mean a write that was 20k after it got compressed. So a 30k file that gets compressed to 20k, in this text I will always label as a "20k write"
+Even if your data itself is not compressable, you should always use lz4 for compression!  
+lz4 costs absolutly nothing in terms of CPU, and it can compress zeros.   
+Here is an example why that is important: We have a 200k text file. 
+That text is unrealistically only random data and can't be compressed.  
+Your dataset record size it the default 128k.  
+To store that file, we need two 128k records. First record is full of data, second record only 72k and the rest zeros. If you disabled compression, you need to store two 128k stripes (256k) for that 200k file. With compresison, the second stripe can be compressed down to 72k and you only use 200k.  
+Again, this is applies even if the data itself might be not compressable. So never disable compression!  
+
+For simplicity, we ignore compression in this doc. When I talk about a 20k write, I mean a write that was 20k after it got compressed. So a 30k file that ends up being two 16k volblocks or one 32k record, which then gets compressed down to 20k, in this text I will always label as a "20k write"
+
 
 With that technical glossary out of the way, let's look at real examples 🙂
 
 ## Dataset
 Datasets apply to ISOs, container templates, and VZDump and are not that affected by the RAIDZ problem. 
-Simply because datasets usually use bigger blocks and it is mostly the small blocks suffering from this storage efficiency issue. 
+Simply because datasets usually stores bigger files and it is the small blocks suffering from this RAIDZ issue. 
 
-I think it is easier to understand the RAIDZ problem, by looking at datasets first and Zvol later on. Because the problem is the same, Zvols are only more prone to that problem.  
+I think it is easier to understand the RAIDZ problem, by looking at datasets first and Zvols later on. Because the problem is the same, Zvols are only more prone to that problem, because the 16k default is smaller.
 
 Let's look at an example of a 3-disk wide RAIDZ1. The max stripe width obviously can't be bigger than the number of disk. 
 So the max stripe width is 3.  
@@ -109,6 +121,8 @@ That means we write 32k to store 20k data.
 32k is 8 sectors (32 / 4).  
 8 sectors is a multiple of 2, so there is no padding needed.  
 
+Disclaimer: This is a slight simplification. Like I said in the beginning, we ignore compression in this doc. But in reality, all these three stripes would be the same 12k size, because the stripe size can be differnt for different files, but not for a single file itself. So for this single 20k file, we would have 3 stripes, that are each 3 sectors long. The last stripe would conist of P1 + D1 and another D1 full of zeros. Which then in return can be compressed to nothing. So after compression, we then get exactly again what we have here in this picture. I know this is a little bit complicated, if you don't get it, just ignore it for now and read it again at the end.
+
 But now the efficiency has changed. If we calculate all together, we wrote 20k data sectors, 12k parity sectors.  
 We wrote 32k to store a 20k file.  
 20k / 32k = 62.5% storage efficiency.  
@@ -136,7 +150,7 @@ We add an extra 4k padding sector to get 12 sectors in total.
 12 / 2 works. 
 So it will look like this:
 ![alt text](../images/6.png)
-Why that is, we take a look in the next chapter. For now, we just accept it.  
+In the next capter we will look into why we sometimes need padding. For now, we just accept it.  
 
 The efficiency has changed again. If we calculate all together, we wrote 28k data sectors, 16k parity sectors, and one 4k padding sector.  
 We wrote 48k to store a 28k file.  
@@ -151,10 +165,10 @@ We simply store a 4k data sector on one disk and one parity sector on another di
 We wrote 8k in sectors to store a 4k file.  
 4k / 8k = 50% storage efficiency.  
 
-This is the same storage efficiency we would expect from a mirror!  Holy shit, that is bad!
+This is the same storage efficiency we would expect from a mirror! Holy shit, that is bad!
 
 **Conclusion for datasets:**  
-If you have a 3-wide RAIDZ1 and only write huge files like pictures, movies, and songs, the efficiency loss gets negligible. For smaller files it isn't great and for 4k files, RAIDZ1 only offers the same storage efficiency as mirror.  
+If you have a 3-wide RAIDZ1 and only write huge files like pictures, movies, and songs, the efficiency loss gets negligible. For smaller files it isn't great and for 4k files, RAIDZ1 even only offers the same storage efficiency as mirror.  
 
 ## Why do we need padding?
 That is a good question. Let's look at an example of what would happen if ZFS would not make use of padding. 
@@ -193,20 +207,24 @@ For Zvols and their fixed volblocksize, it gets more complicated.
 
 In the early days, the default volblocksize was 8k and it was recommended to turn off compression.  
 Nowadays, LZ4 compression is enabled by default and the default volblocksize is 16k.   
-16k is a good default value that works well for every VM.   
+16k is a good default value that works well for most VMs and workloads.   
 
 **The main difference between recordsize and datasets is, that this is a fixed and rather small value**. 
-If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 1MB, it will write multiple 16k chunk blocks. 
+If you zvol for VM uses 16k as volblocksize, every single write will be a 16k block! Every one. Even if you write 1MB, it will write multiple chunks into 16k  blocks. 
 This is very different from datasets, which use record size, which is not a static but a max value!  
 Since "the problem with RAIDZ" especially applies to smaller writes, like you saw in the datatset example above, this problem all of a sudden gets huge with VMs! Because now we force every write to be only 16k in size.   
 
-In theory, you want to have writes that exactly match your volblocksize.  
-For MySQL or MariaDB, this would be 16k. But because you can't predict compression, and compression works very well for stuff like MySQL, you can't predict the size of the writes.  
-A larger volblocksize is good for mostly sequential workloads and can gain compression efficiency.  
-Smaller volblocksize is good for random workloads, has less IO amplification, and less fragmentation, but will use more metadata and have worse space efficiency.  
-We look at the different volblocksizes and how they behave on different pools.  
-I would not recommend you to change it from the default 16k, unless you have some fixed 64k SQL DB or something similar on a second disk going on. A normal Windows VM will have many read and writes that are smaller than 64k.  
-Some people in the forums recommend using 64k on SSDs, because SSDs won't become slower because of fragmentation. I would probably still advise against it, due to read and write ampflification, and some implications on movability to other systems. I would rather stick with the defaults. 
+So you now might ask, why not simpy use a 64k or even 128k volblock size instead. 
+A larger volblocksize could even possibly gain compression efficiency.  
+The problem with too big volblocks is that you potentially suffer from fragmentation and read write amplification.  
+It all depends on your workload.  
+A MySQL DB for example uses mostly 16k. So putting a MySQL DB into a 64k volblock would mean that for every 16k read, it has to read the whole 64k block. Same goes for writes.  
+In theory you want a volblock that exactly matches your workload. But because you can't predict compression, and compression works very well for stuff like MySQL, you can't predict the size of the writes.  
+
+We look at the two most common volblocksizes 16k and 64k and how they behave on different pools.  
+I would not recommend you to change it from the default 16k, unless you have some fixed 64k workload you put in its own Zvol. 
+A normal Windows VM will have many read and writes that are smaller than 64k.  
+Some people in the forums recommend using 64k on SSDs, because SSDs won't become slower because of fragmentation. I would probably still advise against it, due to read and write ampflification, and some implications on movability to other systems. I would rather stick with the 16k default. 
 
 ### volblocksize 16k
 This is the default size for openZFS since 2.2.  
@@ -441,4 +459,4 @@ to datasets. Even RAIDZ datasets are fine. Not only does that help with compress
 you also get smaller VM disks which are easier to snapshot and send, backup, move and so on. 
 Don't be that guy that has a 16TB Windows Server VM disk, just to host Plex :)  
 **Use NVMe (or at least SSD) mirrors for Zvols**  
-**Use RAIDZ2 for huge, sequentially written and read files in datasets**
+**Use RAIDZ2 for huge, sequentially written and read files from datasets**
