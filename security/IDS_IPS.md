@@ -1,8 +1,4 @@
-Copied from here  https://forum.opnsense.org/index.php?topic=44259.msg221025#msg221025
-
-Mostly agree, altough I still think it can be usefull for detection. 
-
-Here is a copy of the message:
+**Copy from a forum message:**
 
 1. Trying to exaustively "enumerate badness" is bound to fail.
 
@@ -56,5 +52,6 @@ So:
 Kind regards,
 Patrick
 
+Source: https://forum.opnsense.org/index.php?topic=44259.msg221025#msg221025
 
-EDIT: here's a paper worth reading that discusses the pros and cons of TLS interception:
+Mostly agree, altough I still think it can be usefull for detection. 
