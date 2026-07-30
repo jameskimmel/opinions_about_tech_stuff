@@ -70,3 +70,6 @@ https://www.heise.de/news/Solarwinds-Update-schliesst-teils-kritische-Luecken-in
 
 - eScan update servers compromised, resulted in deployment of multi-stage malware to enterprise and consumer endpoints globally.
 https://www.morphisec.com/blog/critical-escan-threat-bulletin/
+
+- macOS Tahoe 26.6 Triggers SentinelOne False Positives.
+https://status.n-able.com/2026/07/29/known-issue-macos-tahoe-26-6-triggers-sentinelone-false-positives/
