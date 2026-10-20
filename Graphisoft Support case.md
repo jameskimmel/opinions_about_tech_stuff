@@ -1,3 +1,4 @@
+# Intro
 I don't want to dwell to much in the past, but just for reference, Graphisoft has some Teamwork issues that haunt us since 3 years and IDC support is no help at all.  
 
 We wasted an insane amount of time trying to get through to Graphisoft themselves, without any luck.  
@@ -6,7 +7,13 @@ After 2 years, we finally reached a point where it also happened on their Bimser
 But we still werent able to troubleshoot the underlying issue(s).  
 
 I wanted to log a support case in their forum, but stuff got deleted. This is why I am writing my log here. Of course without mentioning any names. If you think that some information here could be tracked back to you, please write to mail@salzmann.solutions or open up a issues here.  
-Some interactions happened in German and I translated them by LLM. 
+
+Some interactions happened in German and I translated them by LLM.
+
+We also had disagreeing opinions with IDC about how many times I have contacted them, what was said, what should be done better next time and many, many more things.  
+So this time I want a log. For me, but also for IDC and for Graphisoft. 
+
+This is not done in spite, I seriously hope that we finally find a way to work together in a more productive way and profit all from this. We all make mistakes. The important part is to learn from them. 
 
 # Start of contacting IDC support
 
@@ -69,9 +76,9 @@ Jamin Salzmann
 
 ## 20.10.2026 11:04
 This is just an update. I have not heard back from IDC. 
-I did also post about that case here: https://community.graphisoft.com/t5/Teamwork-BIMcloud/Error-occured-during-the-last-teamwork-operation/m-p/718170#M7771
 
-and got this private (why the is everything private with these guys? Why do they dislike transparancy so much?) response from Ms. R. 
+I did also post about that case here: https://community.graphisoft.com/t5/Teamwork-BIMcloud/Error-occured-during-the-last-teamwork-operation/m-p/718170#M7771
+and got this private (why the is everything private with these guys? Why do they dislike transparancy so much?) response from redacted: 
 
 We followed up with IDC and understand that saving the project as a PLN and re-sharing it resolved the immediate issue. However, we also understand that this workaround does not explain why the error occurred or address the concern that it could happen again, particularly as similar behaviour has occurred before.
 
