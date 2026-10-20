@@ -1,4 +1,4 @@
-# RAID Reliability Calculators have one big flaw, 
+# RAID Reliability Calculators have one big flaw 
 **and why mirrors often can be more reliable than RAIDZ2**
 
 Most of us have used one of these great RAID calculators.
